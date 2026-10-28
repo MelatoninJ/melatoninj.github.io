@@ -214,6 +214,14 @@ nav a.nl:hover{color:var(--text);background:color-mix(in srgb,var(--text) 7%,tra
 .swmore.clip::after{content:'';position:absolute;left:0;right:0;bottom:0;height:72px;
   background:linear-gradient(to bottom,transparent,var(--card));pointer-events:none}
 .sw .morebtn{display:block;margin-top:16px}
+.trybar{display:flex;align-items:center;gap:15px;margin-top:15px;flex-wrap:wrap}
+.trybtn{display:inline-block;padding:9px 19px;border-radius:999px;background:var(--accent);
+  color:#fff;font-size:calc(14px * var(--fs));font-weight:500;letter-spacing:-.01em;
+  white-space:nowrap;transition:filter .18s,transform .18s}
+.trybtn:hover{filter:brightness(1.12);transform:translateY(-1px)}
+html[data-theme="dark"] .trybtn{color:#0d0f12}
+.trybar span{flex:1;min-width:230px;font-size:calc(13px * var(--fs));
+  color:var(--muted);line-height:1.56}
 @media(max-width:520px){.brief{grid-template-columns:1fr;gap:1px}
   .brief dt{padding-top:8px} .brief dd{margin-bottom:6px}}
 .role{margin-top:20px;padding-top:16px;border-top:1px solid var(--line);
@@ -575,6 +583,11 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
         <code>git clone https://github.com/MelatoninJ/protein2dna &amp;&amp; cd protein2dna &amp;&amp; pip install -e .</code>
         <button data-copy="git clone https://github.com/MelatoninJ/protein2dna && cd protein2dna && pip install -e .">COPY</button>
       </div>
+      <div class="trybar">
+        <a class="trybtn" href="https://melatoninj.github.io/protein2dna/" target="_blank" rel="noopener">Try it in the browser</a>
+        <span>The same tool, with Python itself running inside the page — nothing you paste is sent anywhere,
+          because there is no server to send it to.</span>
+      </div>
       <div class="swmore">
       <p class="swdef" style="font-size:calc(14.5px * var(--fs));margin-top:12px;color:var(--muted)"><code>p2d ui</code> opens a local
         website in the browser, <code>p2d design</code> and <code>p2d batch</code> run from the terminal, and
@@ -592,10 +605,10 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
       <div class="gwrap" style="margin-top:24px">
         <div class="gal">
           <img class="on" src="img/p2d-1-app.webp" data-cap="Paste a protein, pick a plasmid and two restriction sites, and the whole construct is worked out — in the browser, on your own machine." alt="Paste a protein, pick a plasmid and two restriction sites, and the whole construct is worked out — in the browser, on your own machine.">
-          <img src="img/p2d-2-order.webp" data-cap="The DNA to order — an in-silico digest and ligation confirm it lands exactly as planned." alt="The DNA to order — an in-silico digest and ligation confirm it lands exactly as planned.">
-          <img src="img/p2d-3-validation.webp" data-cap="Compared against ground truth." alt="Compared against ground truth.">
+          <img src="img/p2d-5-pairs.webp" data-cap="Every usable pair of sites, grouped by the protein each one produces and ordered by how little it adds — some keep the vector's own tag, some drop it." alt="Every usable pair of sites, grouped by the protein each one produces and ordered by how little it adds — some keep the vector's own tag, some drop it.">
           <img src="img/p2d-4-fusion.webp" data-cap="What the insert is made of, the check digest, and the fusion protein the vector will express." alt="What the insert is made of, the check digest, and the fusion protein the vector will express.">
-          <img src="img/p2d-5-pairs.webp" data-cap="Every usable pair of sites, grouped by the protein each one produces and ordered by how little it adds." alt="Every usable pair of sites, grouped by the protein each one produces and ordered by how little it adds.">
+          <img src="img/p2d-3-validation.webp" data-cap="The fusion protein residue by residue — the vector's own sequence, the two scar residues the restriction sites leave behind, then your protein." alt="The fusion protein residue by residue — the vector's own sequence, the two scar residues the restriction sites leave behind, then your protein.">
+          <img src="img/p2d-2-order.webp" data-cap="The DNA to order — an in-silico digest and ligation confirm it lands exactly as planned." alt="The DNA to order — an in-silico digest and ligation confirm it lands exactly as planned.">
           <button class="gnav prev" aria-label="Previous image">‹</button>
           <button class="gnav next" aria-label="Next image">›</button>
         </div>
