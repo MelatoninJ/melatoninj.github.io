@@ -1,244 +1,924 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light dark">
-  <title>p2d | Protein to DNA, in your browser</title>
-  <meta name="description" content="Design cloneable DNA for a protein in your own plasmid, and see the fusion protein and the sizes you will actually get.">
-  <link rel="stylesheet" href="app.css?v=2">
-  <!-- bridge.js must run first: it answers the /api/ calls app.js makes. -->
-  <script src="bridge.js?v=2"></script>
-  <script src="app.js?v=2" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Minjae Kim</title>
+<!-- 검색엔진 색인 제외. 공개로 찾히게 하려면 이 줄과 robots.txt 를 지우세요. -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Minjae Kim — computational protein design and its experimental validation.">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Minjae Kim — Biology / Bioengineering">
+<meta property="og:description" content="Computational protein design and its experimental validation.">
+<meta property="og:url" content="https://melatoninj.github.io/">
+<meta property="og:image" content="https://melatoninj.github.io/img/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --fs:1;
+  --card:#ffffff; --card-soft:rgba(255,255,255,.72);
+  --text:#16181d; --body:#3d434d; --muted:#6a707b; --faint:#7e8694; --line:#e7e9ee;
+  --link:#1b6350; --accent:#1b6350; --wet:#2b7f60; --dry:#3d5da8;
+  --live:#8fb8d8;
+  --shadow:0 1px 2px rgba(16,20,28,.025), 0 8px 26px rgba(16,20,28,.055);
+  --shadow-lift:0 2px 6px rgba(16,20,28,.04), 0 18px 48px rgba(16,20,28,.095);
+  --pill:rgba(255,255,255,.76);
+}
+html[data-theme="dark"]{
+  --card:#15181d; --card-soft:rgba(24,28,34,.7);
+  --text:#edeff3; --body:#c3c9d2; --muted:#9aa2ae; --faint:#5d6674; --line:#262b33;
+  --link:#6ec69f; --accent:#6ec69f; --wet:#6ec69f; --dry:#8aa5e8;
+  --shadow:0 1px 2px rgba(0,0,0,.35), 0 10px 36px rgba(0,0,0,.4);
+  --shadow-lift:0 2px 8px rgba(0,0,0,.45), 0 24px 64px rgba(0,0,0,.5);
+  --pill:rgba(22,26,32,.7);
+}
+/* 글자 크기 3단계 — 네비의 A 버튼이 html[data-fs] 를 바꾼다 */
+html[data-fs="2"]{--fs:1.12}
+html[data-fs="3"]{--fs:1.26}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:110px}
+body{
+  color:var(--text);background:#f3f4f7;
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  font-size:calc(16.5px * var(--fs));line-height:1.75;-webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+html[data-theme="dark"] body{background:#0d0f12}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,h4,.disp{font-family:'Space Grotesk',sans-serif}
+
+#field{position:fixed;inset:0;width:100%;height:100%;z-index:-1}
+
+/* ============ nav ============ */
+nav{position:fixed;top:18px;left:0;right:0;z-index:80;display:flex;justify-content:center;padding:0 16px}
+nav .pill{
+  display:flex;align-items:center;gap:6px;padding:7px 8px 7px 16px;
+  background:var(--pill);backdrop-filter:blur(20px) saturate(1.6);
+  border:1px solid rgba(255,255,255,.5);border-radius:999px;
+  box-shadow:0 2px 10px rgba(16,20,28,.06),0 12px 40px rgba(16,20,28,.09);max-width:100%;
+}
+html[data-theme="dark"] nav .pill{border-color:rgba(255,255,255,.09)}
+.brand{display:flex;align-items:center;gap:9px;font-family:'Space Grotesk',sans-serif;
+  font-weight:600;font-size:15px;letter-spacing:-.02em;margin-right:8px;white-space:nowrap}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--live);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--live) 26%,transparent);transition:background .4s}
+nav a.nl{padding:6px 13px;border-radius:999px;font-size:14px;color:var(--muted);transition:.18s;white-space:nowrap}
+nav a.nl:hover{color:var(--text);background:color-mix(in srgb,var(--text) 7%,transparent)}
+#theme,#fs{width:31px;height:31px;border:none;border-radius:50%;cursor:pointer;
+  background:color-mix(in srgb,var(--text) 8%,transparent);color:var(--muted);
+  display:grid;place-items:center;font-size:13px;margin-left:4px;flex-shrink:0}
+#theme:hover,#fs:hover{color:var(--text)}
+#fs{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;letter-spacing:-.02em}
+#fs.on{color:var(--accent);background:color-mix(in srgb,var(--accent) 15%,transparent)}
+@media(max-width:860px){ nav a.nl{display:none} }
+
+/* ============ shell ============ */
+.shell{max-width:1200px;margin:0 auto;padding:0 24px}
+.panel{background:var(--card);border-radius:22px;box-shadow:var(--shadow);
+  padding:clamp(34px,5vw,70px);margin-bottom:26px}
+.open{padding:clamp(26px,3.5vw,44px) 0 clamp(10px,2vw,24px)}
+
+/* ============ hero ============ */
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;
+  padding:120px 0 130px;position:relative}
+.hero h1{font-size:clamp(2.6rem,8.4vw,6.4rem);font-weight:500;letter-spacing:-.045em;
+  line-height:1;white-space:nowrap}
+.hero .say{margin-top:28px;font-family:'Space Grotesk',sans-serif;
+  font-size:calc(clamp(1.1rem,2.6vw,1.8rem) * var(--fs));font-weight:300;line-height:1.35;
+  letter-spacing:-.025em;color:var(--body)}
+.hero .say b{font-weight:500;color:var(--text)}
+.scrollcue{position:absolute;bottom:46px;left:0;font-family:'JetBrains Mono',monospace;
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);
+  display:flex;align-items:center;gap:10px}
+.scrollcue i{display:block;width:1px;height:34px;background:currentColor;
+  animation:drop 2.6s ease-in-out infinite;transform-origin:top}
+@keyframes drop{0%,100%{transform:scaleY(.35);opacity:.5}50%{transform:scaleY(1);opacity:1}}
+.inline{display:flex;gap:9px;flex-wrap:wrap;margin-top:38px}
+.chip{padding:8px 17px;border-radius:999px;font-size:14px;color:var(--muted);
+  background:var(--card);box-shadow:var(--shadow);transition:.2s}
+.chip:hover{color:var(--text);transform:translateY(-2px);box-shadow:var(--shadow-lift)}
+.chip.on{background:var(--text);color:var(--card);font-weight:500}
+.chip.on:hover{color:var(--card)}
+
+/* ============ section head ============ */
+.shead{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.shead h2{font-size:calc(clamp(1.9rem,3.8vw,2.7rem) * var(--fs));font-weight:500;letter-spacing:-.032em;line-height:1.1}
+
+/* ============ about ============ */
+.about{display:grid;grid-template-columns:1fr 300px;gap:56px;margin-top:40px;align-items:start}
+@media(max-width:880px){.about{grid-template-columns:1fr;gap:34px}}
+.about p{margin-bottom:17px;font-weight:400;color:var(--body);font-size:calc(16.5px * var(--fs));max-width:62ch}
+.about p:last-child{margin-bottom:0}
+.about .ln{color:var(--link);border-bottom:1px solid color-mix(in srgb,var(--link) 34%,transparent)}
+.pf{width:100%;aspect-ratio:4/5;border-radius:20px;object-fit:cover;
+  background:linear-gradient(150deg,#e4e8f0,#cdd4e2);box-shadow:var(--shadow)}
+.pfcap{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--faint);
+  margin-top:10px;letter-spacing:.05em}
+
+/* ============ featured project cards ============ */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:42px}
+@media(max-width:880px){.cards{grid-template-columns:1fr;gap:22px}}
+.proj{background:var(--card);border-radius:20px;box-shadow:var(--shadow);padding:clamp(24px,2.4vw,32px);
+  display:flex;flex-direction:column;
+  transition:transform .3s cubic-bezier(.2,.7,.3,1),box-shadow .3s ease}
+.proj:hover{transform:translateY(-5px);box-shadow:var(--shadow-lift)}
+.pfig{border-radius:16px;overflow:hidden;background:color-mix(in srgb,var(--text) 4%,transparent);
+  border:1px solid var(--line);margin-bottom:22px}
+.pfig img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover}
+.pfig .ph{aspect-ratio:4/3;display:grid;place-items:center;text-align:center;padding:20px;
+  color:var(--faint);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:2}
+
+/* ============ image gallery ============ */
+.gwrap{margin-bottom:20px}
+.gal{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);
+  background:color-mix(in srgb,var(--text) 4%,transparent)}
+.gal img{width:100%;aspect-ratio:4/3;object-fit:cover;display:none}
+.gal img.on{display:block;animation:fadein .32s ease}
+@keyframes fadein{from{opacity:.4}to{opacity:1}}
+.gnav{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border:none;
+  border-radius:50%;background:rgba(255,255,255,.84);backdrop-filter:blur(6px);color:#14161a;
+  font-size:20px;line-height:0;cursor:pointer;display:grid;place-items:center;padding:0 0 3px 0;
+  box-shadow:0 2px 10px rgba(16,20,28,.2);opacity:0;transition:opacity .2s,background .2s}
+.gal:hover .gnav,.gal:focus-within .gnav{opacity:1}
+.gnav:hover{background:#fff}
+.gnav.prev{left:10px} .gnav.next{right:10px}
+@media(hover:none){.gnav{opacity:.92}}
+.gal img.on{cursor:zoom-in}
+.gbar{display:flex;align-items:center;gap:12px;margin-top:11px;padding:0 2px}
+.gcap{flex:1;font-size:calc(13.5px * var(--fs));color:var(--muted);font-weight:400;line-height:1.55}
+.gcount{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--faint);flex-shrink:0}
+.gdots{display:flex;gap:5px;flex-shrink:0}
+.gdots i{width:6px;height:6px;border-radius:50%;background:var(--line);display:block;
+  cursor:pointer;transition:transform .2s,background .2s}
+.gdots i.on{background:var(--accent);transform:scale(1.3)}
+
+/* ============ lightbox ============ */
+/* display 를 지정하는 클래스는 hidden 속성을 이기므로 먼저 막아둔다 */
+[hidden]{display:none !important}
+.lb{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
+  background:rgba(10,12,16,.93);backdrop-filter:blur(8px);animation:lbin .22s ease}
+@keyframes lbin{from{opacity:0}to{opacity:1}}
+.lb img{max-width:min(94vw,1600px);max-height:80vh;object-fit:contain;display:block;
+  border-radius:6px;background:#fff;box-shadow:0 24px 80px rgba(0,0,0,.5)}
+.lb-close{position:absolute;top:18px;right:20px;width:44px;height:44px;border:none;border-radius:50%;
+  background:rgba(255,255,255,.1);color:#fff;font-size:24px;line-height:0;cursor:pointer;
+  display:grid;place-items:center;transition:background .18s}
+.lb-close:hover{background:rgba(255,255,255,.22)}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:54px;height:54px;border:none;
+  border-radius:50%;background:rgba(255,255,255,.1);color:#fff;font-size:30px;line-height:0;
+  cursor:pointer;display:grid;place-items:center;padding:0 0 4px 0;transition:background .18s}
+.lb-nav:hover{background:rgba(255,255,255,.22)}
+.lb-nav.prev{left:max(16px,3vw)} .lb-nav.next{right:max(16px,3vw)}
+.lb-bar{position:absolute;left:0;right:0;bottom:0;padding:20px max(16px,6vw) 26px;
+  display:flex;align-items:baseline;gap:16px;justify-content:center;
+  background:linear-gradient(to top,rgba(10,12,16,.75),transparent)}
+.lb-cap{color:rgba(255,255,255,.88);font-size:calc(14.5px * var(--fs));font-weight:400;line-height:1.55;max-width:74ch}
+.lb-count{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(255,255,255,.5);
+  flex-shrink:0;letter-spacing:.06em}
+@media(max-width:700px){.lb img{max-height:68vh}
+  .lb-nav{width:44px;height:44px;font-size:24px} .lb-cap{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.lb{animation:none}}
+.pnum{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--faint);letter-spacing:.08em}
+.tags{display:flex;gap:7px;margin-top:15px;flex-wrap:wrap}
+.tag{font-size:calc(13px * var(--fs));font-weight:400;letter-spacing:0;color:var(--muted);line-height:1.5;
+  padding:4px 12px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}
+.tag.k{color:var(--text);border-color:color-mix(in srgb,var(--text) 20%,transparent)}
+.tag.y{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.05em;padding:4px 11px}
+.proj h3{font-size:calc(clamp(1.34rem,2.5vw,1.74rem) * var(--fs));font-weight:500;letter-spacing:-.026em;
+  line-height:1.24;margin-top:10px}
+.hook{margin-top:13px;font-family:'Space Grotesk',sans-serif;font-size:calc(17.5px * var(--fs));font-weight:500;
+  letter-spacing:-.018em;line-height:1.42;color:var(--accent)}
+.proj p.d{margin-top:16px;font-size:calc(16px * var(--fs));font-weight:400;color:var(--body)}
+.proj p.d + p.d{margin-top:11px}
+.proj p.d b{font-weight:500;color:var(--text)}
+/* Built / For / Now 요약 블록 */
+.brief{display:grid;grid-template-columns:54px 1fr;gap:2px 18px;margin-top:22px}
+.brief dt{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);padding-top:7px}
+.brief dd{margin:0 0 13px;font-size:calc(16px * var(--fs));font-weight:400;color:var(--body);line-height:1.74}
+.brief dd:last-of-type{margin-bottom:0}
+.brief dd b{font-weight:500;color:var(--text)}
+.brief.clip{max-height:calc(150px * var(--fs));overflow:hidden;position:relative}
+.brief.clip::after{content:'';position:absolute;left:0;right:0;bottom:0;height:70px;
+  background:linear-gradient(to bottom,transparent,var(--card));pointer-events:none}
+.morebtn{align-self:flex-start;margin-top:14px;background:none;border:none;padding:3px 0;
+  font-family:inherit;font-size:calc(14.5px * var(--fs));color:var(--accent);cursor:pointer;
+  border-bottom:1px solid color-mix(in srgb,var(--accent) 34%,transparent)}
+.morebtn:hover{border-bottom-color:var(--accent)}
+.swmore{margin-top:0}
+.swmore.clip{max-height:calc(150px * var(--fs));overflow:hidden;position:relative}
+.swmore.clip::after{content:'';position:absolute;left:0;right:0;bottom:0;height:72px;
+  background:linear-gradient(to bottom,transparent,var(--card));pointer-events:none}
+.sw .morebtn{display:block;margin-top:16px}
+.trybar{display:flex;align-items:center;gap:15px;margin-top:15px;flex-wrap:wrap}
+.trybtn{display:inline-block;padding:9px 19px;border-radius:999px;background:var(--accent);
+  color:#fff;font-size:calc(14px * var(--fs));font-weight:500;letter-spacing:-.01em;
+  white-space:nowrap;transition:filter .18s,transform .18s}
+.trybtn:hover{filter:brightness(1.12);transform:translateY(-1px)}
+html[data-theme="dark"] .trybtn{color:#0d0f12}
+.trybar span{flex:1;min-width:230px;font-size:calc(13px * var(--fs));
+  color:var(--muted);line-height:1.56}
+@media(max-width:520px){.brief{grid-template-columns:1fr;gap:1px}
+  .brief dt{padding-top:8px} .brief dd{margin-bottom:6px}}
+.role{margin-top:20px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:calc(14.5px * var(--fs));color:var(--muted);font-weight:400}
+.role b{font-weight:600;color:var(--text)}
+.proj > div:last-child{display:flex;flex-direction:column;flex:1}
+.icons{display:flex;gap:8px;margin-top:auto;padding-top:20px}
+.icons a{width:37px;height:37px;border:1px solid var(--line);border-radius:10px;
+  display:grid;place-items:center;color:var(--muted);transition:.18s}
+.icons a:hover{color:var(--text);border-color:var(--muted);transform:translateY(-2px)}
+.icons svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;
+  stroke-linecap:round;stroke-linejoin:round}
+
+/* ============ software ============ */
+.sw{background:var(--card);border-radius:20px;box-shadow:var(--shadow);
+  padding:clamp(26px,3vw,38px);margin-top:42px;
+  transition:transform .3s cubic-bezier(.2,.7,.3,1),box-shadow .3s}
+.sw:hover{transform:translateY(-4px);box-shadow:var(--shadow-lift)}
+.swtop{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.swname{font-family:'JetBrains Mono',monospace;font-size:clamp(19px,2.4vw,24px);
+  font-weight:500;letter-spacing:-.03em}
+.swname a:hover{color:var(--link)}
+.badges{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.badge-t{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.04em;
+  padding:3px 8px;border-radius:5px;border:1px solid var(--line);color:var(--muted)}
+.swdef{margin-top:16px;font-size:calc(16.5px * var(--fs));font-weight:400;color:var(--body);max-width:70ch;line-height:1.72}
+.swdef b{font-weight:500}
+.install{display:flex;align-items:center;gap:12px;margin-top:20px;
+  background:color-mix(in srgb,var(--text) 5%,transparent);
+  border:1px solid var(--line);border-radius:12px;padding:11px 14px;
+  font-family:'JetBrains Mono',monospace;font-size:13.5px}
+.install .p{color:var(--faint);user-select:none}
+.install code{flex:1;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.install code::-webkit-scrollbar{display:none}
+.install button{border:none;background:transparent;cursor:pointer;color:var(--faint);
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;
+  padding:3px 7px;border-radius:5px;transition:.16s;flex-shrink:0}
+.install button:hover{color:var(--text);background:color-mix(in srgb,var(--text) 8%,transparent)}
+.feat{margin-top:24px;padding-top:20px;border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(2,1fr);gap:10px 28px}
+@media(max-width:700px){.feat{grid-template-columns:1fr}}
+.feat div{font-size:calc(15.5px * var(--fs));font-weight:400;color:var(--body);line-height:1.68}
+.feat div::before{content:'—';color:var(--faint);margin-right:9px}
+.swfig{margin-top:24px;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#fff}
+.swfig img{width:100%;display:block}
+html[data-theme="dark"] .swfig{background:#f7f8fa}
+
+/* ============ skills ============ */
+.spec2{display:grid;grid-template-columns:1fr 1fr;gap:26px;margin-top:38px}
+@media(max-width:760px){.spec2{grid-template-columns:1fr;gap:20px}}
+.col2{border:1px solid var(--line);border-radius:18px;padding:28px 26px}
+.col2 h4{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;font-weight:500;margin-bottom:16px}
+.col2.w h4{color:var(--wet)} .col2.d h4{color:var(--dry)}
+.col2 ul{list-style:none}
+.col2 li{padding:10px 0;border-top:1px solid var(--line);font-size:calc(15.5px * var(--fs));font-weight:400;color:var(--body)}
+.col2 li:first-child{border-top:none}
+.col2.w{border-color:color-mix(in srgb,var(--wet) 26%,transparent)}
+.col2.d{border-color:color-mix(in srgb,var(--dry) 26%,transparent)}
+
+/* ============ timeline ============ */
+.tl{margin-top:34px}
+.it{display:grid;grid-template-columns:130px 1fr;gap:22px;padding:18px 0;border-top:1px solid var(--line)}
+.it:first-child{border-top:none}
+@media(max-width:640px){.it{grid-template-columns:1fr;gap:4px}}
+.it .d{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--faint);padding-top:4px}
+.it .h{font-family:'Space Grotesk',sans-serif;font-size:calc(18px * var(--fs));font-weight:500;letter-spacing:-.02em}
+.it .s{color:var(--body);font-size:calc(15.5px * var(--fs));font-weight:400}
+.it .h .ln{color:inherit;border-bottom:1px solid color-mix(in srgb,var(--link) 45%,transparent)}
+.it .h .ln:hover{color:var(--link);border-bottom-color:var(--link)}
+
+/* ============ contact ============ */
+.cta{text-align:center;padding:clamp(44px,6vw,80px) clamp(24px,5vw,64px)}
+.cta .big{font-family:'Space Grotesk',sans-serif;font-size:calc(clamp(1.7rem,4vw,2.7rem) * var(--fs));
+  font-weight:400;letter-spacing:-.035em;line-height:1.18}
+.cta .em{display:inline-block;margin-top:22px;font-size:calc(18px * var(--fs));color:var(--link);
+  border-bottom:1px solid color-mix(in srgb,var(--link) 40%,transparent)}
+.cta .inline{justify-content:center;margin-top:30px}
+footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)}
+
+.rv{opacity:0;transform:translateY(20px);transition:opacity .7s cubic-bezier(.2,.7,.3,1),transform .7s cubic-bezier(.2,.7,.3,1)}
+.rv.on{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}
+  .proj:hover,.mcard:hover,.chip:hover,.sw:hover,.icons a:hover{transform:none}
+  .scrollcue i{animation:none}}
+</style>
 </head>
 <body>
-  <a class="skip" href="#result">Skip to result</a>
+<canvas id="field" aria-hidden="true"></canvas>
 
-  <header class="top">
-    <div class="wrap top-row">
-      <a class="brand" href="./" aria-label="p2d home">p2d</a>
-      <p class="tagline">Protein to DNA, checked against your vector.</p>
-      <button type="button" class="ghost" id="theme-toggle" aria-label="Switch colour theme">Theme</button>
+<nav>
+  <div class="pill">
+    <a class="brand" href="#top"><span class="dot"></span>Minjae Kim</a>
+    <a class="nl" href="#about">About</a>
+    <a class="nl" href="#projects">Projects</a>
+    <a class="nl" href="#software">Software</a>
+    <a class="nl" href="#spectrum">Skills</a>
+    <a class="nl" href="#record">Record</a>
+    <button id="fs" aria-label="Text size: 100%" title="Text size">A</button>
+    <button id="theme" aria-label="Toggle theme">◐</button>
+  </div>
+</nav>
+
+<div class="shell" id="top">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <h1>Minjae Kim</h1>
+    <p class="say">Aspiring Engineer applying nature’s products</p>
+    <div class="inline">
+      <a class="chip on" href="#projects">See projects</a>
+      <a class="chip" href="mailto:supermin08@gmail.com">Email</a>
     </div>
-  </header>
+    <div class="scrollcue"><i></i> Scroll</div>
+  </section>
 
-  <main class="wrap layout">
-    <form id="design-form" class="panel" novalidate>
-      <h1>Design an insert</h1>
-
-      <div class="field">
-        <div class="label-row">
-          <label for="protein">Protein sequence</label>
-          <button type="button" class="link" id="load-example">Load GFP example</button>
+  <!-- ============ ABOUT ============ -->
+  <section class="panel rv" id="about">
+    <div class="shead"><h2>About</h2></div>
+    <div class="about">
+      <div>
+        <p>Minjae Kim is a senior at <a class="ln" href="https://sshs.sen.hs.kr/">Seoul Science High School</a>,
+           drawn to synthetic biology and working toward becoming a biological and biomedical engineer.
+           His interests are morphogenesis, spatial omics, programmable organoids and cell–cell communication.</p>
+        <p>He designs molecules with bioinformatics and AI, and at the same time works out where those
+           models break down in the setting he is designing for. Through the invention club he is equally at home
+          building the hardware an experiment needs and writing the software that runs it — Arduino, CAD, Raspberry Pi, Programming.</p>
+        <p>A question that began in a biomedical engineering R&amp;E now runs through his graduate thesis and
+           past it: using RFdiffusion, AlphaFold and Boltz-2 he designs and expresses VHHs against a
+           membrane protein, and tests whether they can capture cells selectively.</p>
+        <div class="inline" style="margin-top:28px">
+          <a class="chip" href="mailto:supermin08@gmail.com">Email</a>
+          <a class="chip" href="https://github.com/MelatoninJ">GitHub</a>
         </div>
-        <textarea id="protein" name="protein" rows="7" spellcheck="false" autocomplete="off"
-                  aria-describedby="protein-help protein-count" placeholder="MKTAYIAKQR..."></textarea>
-        <div class="help-row">
-          <p id="protein-help" class="help">Amino acids or FASTA. Enter the protein as it is. The note under the sites says when to leave the first M out.</p>
-          <p id="protein-count" class="count" aria-live="polite">0 aa</p>
-        </div>
-        <p id="protein-error" class="field-error" role="alert" hidden></p>
       </div>
-
-      <fieldset class="field">
-        <legend>Plasmid</legend>
-        <select id="vector" name="vector" aria-label="Plasmid"></select>
-        <div class="row">
-          <button type="button" class="secondary" id="upload-btn">Upload a file</button>
-          <button type="button" class="secondary" id="paste-btn" aria-expanded="false" aria-controls="paste-box">Paste a sequence</button>
-          <input type="file" id="vector-file" hidden accept=".gb,.gbk,.genbank,.gbff,.dna,.fa,.fasta,.fna,.txt">
-        </div>
-        <p class="help">GenBank (.gb), SnapGene (.dna) or FASTA. Files stay on this computer. A plasmid with no annotation can name its start codon in the FASTA header (see Paste a sequence).</p>
-        <div id="paste-box" class="paste" hidden>
-          <label for="paste-text">Plasmid DNA (FASTA, GenBank text or plain sequence)</label>
-          <textarea id="paste-text" rows="5" spellcheck="false" autocomplete="off" placeholder="&gt;my_plasmid start=5307 mcs=5305-5380&#10;TTGACAATTAATCATC..."></textarea>
-          <p class="help">For a FASTA plasmid without annotation, write the start codon in the header: <code>start=5307</code> is the position of the A of the ATG, and <code>mcs=5305-5380</code> (optional) is the cloning region. Positions count from 1 on the strand as written.</p>
-          <button type="button" class="secondary" id="paste-use">Use this plasmid</button>
-        </div>
-        <p id="vector-status" class="help" role="status" aria-live="polite"></p>
-
-        <div id="vector-card" class="vcard" hidden>
-          <p id="vector-summary" class="vsummary"></p>
-          <ul id="vector-warnings" class="vwarn"></ul>
-          <div class="field">
-            <label for="start">Translation starts at</label>
-            <select id="start" name="start"></select>
-          </div>
-          <div id="start-manual-box" class="field" hidden>
-            <label for="start-manual">ATG position (bp)</label>
-            <input id="start-manual" type="number" min="1" inputmode="numeric">
-          </div>
-          <p id="start-note" class="help"></p>
-          <details class="why" id="features-box">
-            <summary id="features-summary">Annotated features</summary>
-            <ul id="features-list"></ul>
-          </details>
-        </div>
-      </fieldset>
-
-      <fieldset class="field" id="sites-field" disabled>
-        <legend>Restriction sites</legend>
-        <div id="mcs" class="mcs" role="img" aria-label="Restriction sites along the plasmid"></div>
-        <p id="mcs-key" class="help"></p>
-        <div class="window">
-          <div class="field">
-            <label for="win-from">Show from (bp)</label>
-            <input id="win-from" type="number" min="1" inputmode="numeric">
-          </div>
-          <div class="field">
-            <label for="win-to">to (bp)</label>
-            <input id="win-to" type="number" min="1" inputmode="numeric">
-          </div>
-          <button type="button" class="link" id="win-all">Whole plasmid</button>
-          <button type="button" class="link" id="win-orf">Expression region</button>
-          <button type="button" class="link" id="win-mcs" hidden>Annotated MCS</button>
-        </div>
-        <label class="check"><input type="checkbox" id="multi" checked> Include enzymes that cut more than once</label>
-        <div class="suggest">
-          <button type="button" class="secondary" id="suggest-btn">Suggest site pairs</button>
-          <div class="field">
-            <label for="ntag-filter">N-terminal tag</label>
-            <select id="ntag-filter">
-              <option value="any">Any</option>
-              <option value="keep">Keep the vector's</option>
-              <option value="remove">Remove it</option>
-            </select>
-          </div>
-        </div>
-        <div id="suggestions" class="suggestions" hidden aria-live="polite"></div>
-        <div class="pair">
-          <div class="field">
-            <label for="upstream">5' site</label>
-            <select id="upstream" name="upstream"></select>
-          </div>
-          <div class="field">
-            <label for="downstream">3' site</label>
-            <select id="downstream" name="downstream"></select>
-          </div>
-        </div>
-        <p id="pair-note" class="help" aria-live="polite"></p>
-        <details id="why" class="why" hidden>
-          <summary>Why are some sites unavailable?</summary>
-          <ul id="why-list"></ul>
-        </details>
-      </fieldset>
-
-      <fieldset class="field">
-        <legend>Tags and linkers</legend>
-        <p class="help">Built onto your protein as extra residues. Leave them out if your sequence already carries them.</p>
-        <div class="pair">
-          <div class="field">
-            <label for="n-tag">N-terminal tag</label>
-            <select id="n-tag"></select>
-          </div>
-          <div class="field">
-            <label for="n-linker">Linker after it</label>
-            <select id="n-linker"></select>
-          </div>
-          <div class="field">
-            <label for="c-linker">Linker before the C-terminal tag</label>
-            <select id="c-linker"></select>
-          </div>
-          <div class="field">
-            <label for="c-tag">C-terminal tag</label>
-            <select id="c-tag"></select>
-          </div>
-        </div>
-      </fieldset>
-
-      <fieldset class="field">
-        <legend>C-terminus</legend>
-        <div class="choices">
-          <label class="choice">
-            <input type="radio" name="cterm" value="stop" checked>
-            <b>Stop codon</b>
-            <span>The protein ends with your sequence. Nothing from the vector is read.</span>
-          </label>
-          <label class="choice" id="cterm-tag-choice">
-            <input type="radio" name="cterm" value="tag" id="cterm-tag">
-            <b>Read into the vector's own C-terminal tag</b>
-            <span id="cterm-tag-note">Adds the bases that put the tag in frame.</span>
-          </label>
-        </div>
-      </fieldset>
-
-      <div class="field">
-        <label for="stop-codons">Stop codons</label>
-        <select id="stop-codons" name="stop_codons">
-          <option value="1" selected>One</option>
-          <option value="2">Two in a row</option>
-        </select>
-        <p class="help">One is the usual choice, the host's most used stop codon. Two are sometimes used to guard against read-through.</p>
+      <div>
+        <img class="pf" src="img/profile.webp" alt="Minjae Kim">
       </div>
-
-      <fieldset class="field">
-        <legend>Extra bases for ordering</legend>
-        <div class="pair">
-          <div class="field">
-            <label for="clamp-5">At the 5' end</label>
-            <input id="clamp-5" name="clamp_5" type="number" min="0" max="30" value="6" inputmode="numeric">
-          </div>
-          <div class="field">
-            <label for="clamp-3">At the 3' end</label>
-            <input id="clamp-3" name="clamp_3" type="number" min="0" max="30" value="6" inputmode="numeric">
-          </div>
-        </div>
-        <p class="help">Enzymes cut poorly at the very end of a DNA fragment, so a synthetic fragment needs a few bases beyond each site. They are cut away and never reach your plasmid. Six on each side is a common guideline; some enzymes need fewer.</p>
-      </fieldset>
-
-      <div class="field">
-        <label for="host">Expression host</label>
-        <select id="host" name="host"></select>
-        <p id="host-note" class="help"></p>
-      </div>
-
-      <details class="field" id="limits-box">
-        <summary>GC and repeat limits</summary>
-        <p class="help">After choosing codons, p2d swaps synonymous codons to bring the DNA inside these limits, without ever adding a cloning site. The starting values are the host profile's defaults and have not been checked against a reference, so set the ones your synthesis or cloning work needs. Anything the protein forces stays and is reported.</p>
-        <div class="pair">
-          <div class="field"><label for="lim-gc-min">Overall GC from (%)</label><input id="lim-gc-min" type="number" min="0" max="100" inputmode="numeric"></div>
-          <div class="field"><label for="lim-gc-max">Overall GC to (%)</label><input id="lim-gc-max" type="number" min="0" max="100" inputmode="numeric"></div>
-          <div class="field"><label for="lim-window-size">Window size (bases)</label><input id="lim-window-size" type="number" min="10" max="500" inputmode="numeric"></div>
-          <div class="field"><label for="lim-repeat-max">Longest direct repeat (bases)</label><input id="lim-repeat-max" type="number" min="8" max="200" inputmode="numeric"></div>
-          <div class="field"><label for="lim-window-min">Window GC from (%)</label><input id="lim-window-min" type="number" min="0" max="100" inputmode="numeric"></div>
-          <div class="field"><label for="lim-window-max">Window GC to (%)</label><input id="lim-window-max" type="number" min="0" max="100" inputmode="numeric"></div>
-        </div>
-        <button type="button" class="secondary" id="lim-reset">Use the host's values</button>
-      </details>
-
-      <fieldset class="field">
-        <legend>Codon strategy</legend>
-        <div id="strategies" class="choices"></div>
-      </fieldset>
-
-      <div class="field">
-        <label for="seed">Seed</label>
-        <input id="seed" name="seed" type="number" inputmode="numeric" min="0" max="4294967295" placeholder="Optional" aria-describedby="seed-help">
-        <p id="seed-help" class="help">Leave empty for a reproducible default. The same inputs always give the same DNA.</p>
-      </div>
-
-      <button type="submit" class="primary" id="submit">Design insert</button>
-    </form>
-
-    <div class="stage">
-      <section id="result" class="result" tabindex="-1" aria-live="polite" aria-label="Design result"></section>
-      <details class="batch" id="batch-box">
-        <summary>Design many proteins at once</summary>
-        <p class="help">Uses the vector, start codon, sites, C-terminus, tags, host, limits and extra bases chosen above for every protein. Paste FASTA text, or load a file. A protein that cannot be cloned is reported by name and the rest carry on.</p>
-        <label for="batch-input">Proteins (FASTA, one record each)</label>
-        <textarea id="batch-input" rows="8" spellcheck="false" autocomplete="off" placeholder=">binder_1&#10;MKVL...&#10;>binder_2&#10;SKGE..."></textarea>
-        <div class="row">
-          <button type="button" class="secondary" id="batch-file-btn">Load a FASTA file</button>
-          <input id="batch-file" type="file" accept=".fa,.fasta,.faa,.txt" hidden>
-          <button type="button" class="primary" id="batch-btn">Design all</button>
-        </div>
-        <div id="batch-result" aria-live="polite"></div>
-      </details>
     </div>
-  </main>
+  </section>
 
-  <footer class="wrap foot">
-    <p>Runs entirely in this tab. Python itself is downloaded once and executed by your browser, so nothing you paste or upload is sent anywhere — there is no server to send it to.</p>
-  </footer>
+  <!-- ============ PROJECTS ============ -->
+  <section class="open rv" id="projects">
+    <div class="shead"><h2>Projects</h2></div>
+
+    <div class="cards">
+
+      <article class="proj">
+        <div class="gwrap">
+          <div class="gal">
+            <img class="on" src="img/epcam-01-complex.webp" data-cap="208 bound to the EpCAM cis-dimer. The target epitope in mint." alt="208 bound to the EpCAM cis-dimer. The target epitope in mint.">
+            <img src="img/epcam-02-crystals.webp" data-cap="Placed against 33 known crystal structures: 85% of the interface is CDR, with three framework residues on average." alt="Placed against 33 known crystal structures: 85% of the interface is CDR, with three framework residues on average.">
+            <img src="img/epcam-03-benchmark.webp" data-cap="Epitope accuracy by predictor across 35 complexes." alt="Epitope accuracy by predictor across 35 complexes.">
+            <img src="img/epcam-04-funnel.webp" data-cap="2,960 → 843 → 526 → 1." alt="2,960 → 843 → 526 → 1.">
+            <img src="img/epcam-05-epitope.webp" data-cap="Why this epitope — conservation, and the three candidates." alt="Why this epitope — conservation, and the three candidates.">
+            <img src="img/epcam-06-digest.webp" data-cap="Restriction digest of the synthesised gene and pRSET-C — the double digest releases the 359 bp VHH coding sequence." alt="Restriction digest of the synthesised gene and pRSET-C.">
+            <img src="img/epcam-07-plates.webp" data-cap="DH5α transformation — insert against the vector-only control." alt="DH5α transformation — insert against the vector-only control.">
+            <img src="img/epcam-09-western.webp" data-cap="Anti-His6 Western along the purification — the VHH at ≈16.4 kDa; the faint band below it is lysozyme bound non-specifically." alt="Anti-His6 Western blot with lanes labelled">
+            <button class="gnav prev" aria-label="Previous image">‹</button>
+            <button class="gnav next" aria-label="Next image">›</button>
+          </div>
+          <div class="gbar"><span class="gcap"></span><span class="gcount"></span><span class="gdots"></span></div>
+        </div>
+        <div>
+          <div class="pnum">01</div>
+          <h3>Design and Expression of an RFdiffusion-based Anti-EpCAM VHH</h3>
+          <p class="hook">A molecular glue that holds a cell without disturbing its state.</p>
+          <div class="tags"><span class="tag k">Graduate thesis</span><span class="tag y">2026</span><span class="tag">Computational + wet lab</span></div>
+          <dl class="brief">
+            <dt>Built</dt><dd>Designed with <b>RFdiffusion, ProteinMPNN and RoseTTAFold2</b>. In the course of designing VHHs a
+              flaw in <b>AlphaFold2</b> surfaced, so the designs were re-evaluated with <b>Boltz-2</b>, which proved
+              the more trustworthy of the two — and all <b>2,960</b> were screened again before one was carried forward.</dd>
+            <dt>For</dt><dd>Patterning a scaffold so a chosen cell lands in a chosen place — setting the initial condition,
+              <i>location</i>, from which cell–cell communication and junction formation can be guided.</dd>
+            <dt>Now</dt><dd>Cloned into pRSET-C, expressed in BL21(DE3), purified over Ni-NTA, confirmed by
+              anti-His6 Western at ~16.4 kDa. Binding assays under way.</dd>
+            <dt>Role</dt><dd>Carried out alone. Dry lab: epitope selection, the design pipeline, the artifact
+              analysis and predictor benchmark, and filtering all 2,960 designs. Wet lab: everything from
+              cloning through purification.</dd>
+          </dl>
+        </div>
+      </article>
+
+      <article class="proj">
+        <div class="gwrap">
+          <div class="gal">
+            <img class="on" src="img/fd-1-plane.webp" data-cap="Two versions of functional breakdown — upper left, degraded; lower right, present but not active." alt="Two versions of functional breakdown — upper left, degraded; lower right, present but not active.">
+            <img src="img/fd-2-structure.webp" data-cap="The two breakdowns sit in different parts of the structure: positions that lose only activity (orange) cluster near the ligand pocket, positions that lose only abundance (blue) lie further out." alt="The two breakdowns sit in different parts of the structure: positions that lose only activity (orange) cluster near the ligand pocket, positions that lose only abundance (blue) lie further out.">
+            <img src="img/fd-3-clinical.webp" data-cap="83% of known disease variants are damaged — but the clinical label never says which of the two breakdowns it is." alt="83% of known disease variants are damaged, but the clinical label never says which of the two breakdowns it is.">
+            <button class="gnav prev" aria-label="Previous image">‹</button>
+            <button class="gnav next" aria-label="Next image">›</button>
+          </div>
+          <div class="gbar"><span class="gcap"></span><span class="gcount"></span><span class="gdots"></span></div>
+        </div>
+        <div>
+          <div class="pnum">02</div>
+          <h3>Functional Decoupling</h3>
+          <p class="hook">Two routes to loss of function.</p>
+          <div class="tags"><span class="tag k">Independent research</span><span class="tag y">2026</span><span class="tag">Variant effect prediction</span></div>
+          <dl class="brief">
+            <dt>Built</dt><dd>A protein has two gates to clear before it works in a cell: it has to fold and stay folded, and
+              the chemistry of its reactive domain has to be intact. I split failures of function by which gate was
+              missed — too little protein in the cell, or enough protein that no longer works — and asked how the two
+              divide. Working from <b>four proteins whose abundance and activity were both measured</b>, I found that
+              <b>which of the two routes a variant takes is itself predictable</b> (AUC 0.80–0.92), and that the
+              prediction still holds on a protein left out of training.</dd>
+            <dt>For</dt><dd>When a patient's variant is interpreted, clinical genetics places it on a single scale from
+              pathogenic to benign. But the two kinds of breakdown separated here call for different treatment:
+              <b>a folding-stability problem can be approached with a chaperone, while a variant that is present in
+              normal amounts and simply inactive cannot.</b></dd>
+            <dt>Now</dt><dd>Analysis complete on the four datasets; looking for more.</dd>
+            <dt>Role</dt><dd>Carried out alone, on the school's server.</dd>
+          </dl>
+        </div>
+      </article>
+
+      <article class="proj">
+        <div class="gwrap">
+          <div class="gal">
+            <img class="on" src="img/emfi-heatmap.webp" data-cap="Fault type across five instructions." alt="Fault type across five instructions.">
+            <img src="img/emfi-die.webp" data-cap="The ATmega2560 die after chemical decapsulation." alt="The ATmega2560 die after chemical decapsulation.">
+            <img src="img/emfi-injection.webp" data-cap="The injection probe positioned over the exposed die." alt="The injection probe positioned over the exposed die.">
+            <button class="gnav prev" aria-label="Previous image">‹</button>
+            <button class="gnav next" aria-label="Next image">›</button>
+          </div>
+          <div class="gbar"><span class="gcap"></span><span class="gcount"></span><span class="gdots"></span></div>
+        </div>
+        <div>
+          <div class="pnum">03</div>
+          <h3>Causal Analysis of Fault Propagation under Electromagnetic Fault Injection Attacks</h3>
+          <p class="hook">A knockout screen run on a microcontroller.</p>
+          <div class="tags"><span class="tag k">GTC-ISPC</span><span class="tag y">2025</span><span class="tag">Hardware + causal analysis</span></div>
+          <dl class="brief">
+            <dt>Built</dt><dd>Treated fault injection as a <b>knockout screen</b>: chemically decapsulated an ATmega2560, scanned the exposed die with 50 ns electromagnetic pulses short enough to land inside one clock cycle, and read the registers, program output and cycle count as the phenotype. A causal model built on the AVR block diagram recovered <b>two dominant propagation paths</b> — one corrupting control flow, one corrupting data.</dd>
+            <dt>For</dt><dd>Designing microcontrollers that fail predictably under fault injection, instead of cataloguing faults after the fact.</dd>
+            <dt>Now</dt><dd>Presented at GTC-ISPC 2025, Physics &amp; Engineering. Second runner-up.</dd>
+            <dt>Role</dt><dd>Proposed the knockout framing; led the causal analysis and the presentation.</dd>
+          </dl>
+        </div>
+      </article>
+
+      <article class="proj">
+        <div class="gwrap">
+          <div class="gal">
+            <img class="on" src="img/morse-1-breadboard.webp" data-cap="Checking with a laser diode and a photoresistor that the beam could be read at all." alt="Checking with a laser diode and a photoresistor that the beam could be read at all.">
+            <img src="img/morse-2-receiver.webp" data-cap="The receiver — a hinged wooden box with a pinhole, an Arduino and a photoresistor inside." alt="The receiver — a hinged wooden box with a pinhole, an Arduino and a photoresistor inside.">
+            <img src="img/morse-3-cad.webp" data-cap="The transmitter frame, modelled to bolt the laser to a tripod head." alt="The transmitter frame, modelled to bolt the laser to a tripod head.">
+            <img src="img/morse-4-rig.webp" data-cap="Alignment — a few millimetres of drift and the beam misses the far roof entirely." alt="Alignment — a few millimetres of drift and the beam misses the far roof entirely.">
+            <img src="img/morse-5-aim.webp" data-cap="Checking that the laser was reaching the school next door." alt="Checking that the laser was reaching the school next door.">
+            <img src="img/morse-6-night.webp" data-cap="On the roof, once it was dark enough to see the beam." alt="On the roof, once it was dark enough to see the beam.">
+            <img src="img/morse-7-roof.webp" data-cap="Watching the far side from our own roof." alt="Watching the far side from our own roof.">
+          <img src="img/morse-8-decoded.webp" data-cap="Decoding what came back: C · U · T · E · B · O · Y." alt="Decoding what came back: C · U · T · E · B · O · Y.">
+            <button class="gnav prev" aria-label="Previous image">‹</button>
+            <button class="gnav next" aria-label="Next image">›</button>
+          </div>
+          <div class="gbar"><span class="gcap"></span><span class="gcount"></span><span class="gdots"></span></div>
+        </div>
+        <div>
+          <div class="pnum">04</div>
+          <h3>Romeo and Juliet with Morse Code</h3>
+          <p class="hook">Letters between two schools, sent in laser morse.</p>
+          <div class="tags"><span class="tag k">Invention club</span><span class="tag y">2024</span><span class="tag">Optical comms</span></div>
+          <dl class="brief">
+            <dt>Built</dt><dd>A line-of-sight optical link to the roof of the school next door: a laser on a tripod at one end,
+              a photoresistor and an Arduino inside a wooden box at the other. The receiver <b>measures its own
+              threshold against the ambient light</b> before each session, then recovers dot, dash and the breaks
+              between letters and words from nothing but how long the beam stays on and off. <b>The link carried over 300 m.</b></dd>
+            <dt>For</dt><dd>Talking across a gap with no network and no radio — and for the romance of it.</dd>
+            <dt>Now</dt><dd>Working. The first sentence through the beam asked for the Instagram ID of a cute boy.</dd>
+          </dl>
+        </div>
+      </article>
+
+      <article class="proj">
+        <div class="gwrap">
+          <div class="gal">
+            <img class="on" src="img/gelcut-1-v1.webp" data-cap="Version 1 — the cut is marked, but the frame blocks the blade from reaching it." alt="Version 1 — the cut is marked, but the frame blocks the blade from reaching it.">
+            <img src="img/gelcut-2-udon.webp" data-cap="Where the fix came from: a hand-made udon board." alt="Where the fix came from: a hand-made udon board.">
+            <img src="img/gelcut-4-v2.webp" data-cap="Version 2 — a hinge and a blade reference added." alt="Version 2 — a hinge and a blade reference added.">
+            <img src="img/gelcut-5-v2b.webp" data-cap="A version that does not depend on the gel's size." alt="A version that does not depend on the gel's size.">
+            <button class="gnav prev" aria-label="Previous image">‹</button>
+            <button class="gnav next" aria-label="Next image">›</button>
+          </div>
+          <div class="gbar"><span class="gcap"></span><span class="gcount"></span><span class="gdots"></span></div>
+        </div>
+        <div>
+          <div class="pnum">05</div>
+          <h3>GelCutGuide</h3>
+          <p class="hook">Borrowed from a udon master's cutting board.</p>
+          <div class="tags"><span class="tag k">Invention club</span><span class="tag y">2026</span><span class="tag">Lab tooling</span></div>
+          <dl class="brief">
+            <dt>Built</dt><dd>A 3D-printed jig for excising DNA bands from agarose, modelled in CAD as three frames
+              sized to the gel trays in our lab. Version 1 marked where to cut, but the frame itself got in the way —
+              the razor blade could not reach the square it was pointing at. The fix came from a hand-made udon board,
+              where the blade is carried by the jig rather than by the hand: <b>version 2 adds a hinge and a blade
+              reference, so the blade swings cleanly into the cut and stays in its lane.</b></dd>
+            <dt>For</dt><dd>Cutting the right band when the transilluminator strips away depth and outline behind the goggles.</dd>
+            <dt>Now</dt><dd>v2 revised, and the electrophoresis test is done.</dd>
+          </dl>
+        </div>
+      </article>
+
+      <article class="proj">
+        <div class="gwrap">
+          <div class="gal">
+            <img class="on" src="img/maker-6-course.webp" data-cap="The finished course — barriers, a turntable and other obstacles along the route." alt="The finished course seen from above">
+            <img src="img/maker-1-plan.webp" data-cap="Blueprint." alt="Blueprint.">
+            <img src="img/maker-2-cad.webp" data-cap="The CAD version." alt="The CAD version.">
+            <img src="img/maker-3-build.webp" data-cap="Assembly — a 3D-printed track on a scaffold of cut profiles and panels." alt="Assembly — a 3D-printed track on a scaffold of cut profiles and panels.">
+            <img src="img/maker-4-model.webp" data-cap="The same track as a 3D model." alt="The track modelled in 3D">
+            <img src="img/maker-5-turntable.webp" data-cap="The turntable set into the track." alt="Turntable built into the course">
+            <button class="gnav prev" aria-label="Previous image">‹</button>
+            <button class="gnav next" aria-label="Next image">›</button>
+          </div>
+          <div class="gbar"><span class="gcap"></span><span class="gcount"></span><span class="gdots"></span></div>
+        </div>
+        <div>
+          <div class="pnum">06</div>
+          <h3>Maker Festival</h3>
+          <p class="hook">1v1 RC Car Obstacle Racing Game</p>
+          <div class="tags"><span class="tag k">Invention club</span><span class="tag y">2024</span><span class="tag">Public exhibit</span></div>
+          <dl class="brief">
+            <dt>Built</dt><dd>A 1v1 game on an RC car course, borrowed from Fall Guys — one player drives, the other
+              does everything to stall them. Hand-drawn layout, redrawn in CAD, cut, then wired: <b>the blockers are
+              servo-driven barriers</b> that swing into the lane on a button press, so the second player is pressing
+              buttons against a car instead of just watching.</dd>
+            <dt>For</dt><dd>An interesting encounter with invention, for primary and middle school students.</dd>
+            <dt>Now</dt><dd>Ran as a hands-on booth for <b>over 100 primary and middle school teams</b> at the 2024
+              Science–Math Convergence Maker Festival, start to finish.</dd>
+          </dl>
+        </div>
+      </article>
+
+
+
+    </div>
+  </section>
+
+  <!-- ============ SOFTWARE ============ -->
+  <section class="open rv" id="software">
+    <div class="shead"><h2>Software</h2></div>
+
+    <article class="sw">
+      <div class="swtop">
+        <div class="swname"><a href="https://github.com/MelatoninJ/protein2dna">p2d</a></div>
+        <div class="badges">
+          <span class="badge-t">v0.2</span>
+          <span class="badge-t">PYTHON · CLI · LOCAL UI</span>
+          <span class="badge-t">MIT</span>
+        </div>
+      </div>
+      <p class="swdef">A tool that designs the DNA for the protein you want to insert — codon optimisation included —
+        against the vector and the restriction enzymes you are actually using. <b>p2d</b> reverse-translates into DNA
+        that can really be cloned into the plasmid you give it, and shows
+        <b>the fusion protein that will be expressed, scar residues and all</b>. It began as something built for
+        his own cloning and was opened up once it was doing the job.</p>
+      <div class="install">
+        <span class="p">$</span>
+        <code>git clone https://github.com/MelatoninJ/protein2dna &amp;&amp; cd protein2dna &amp;&amp; pip install -e .</code>
+        <button data-copy="git clone https://github.com/MelatoninJ/protein2dna && cd protein2dna && pip install -e .">COPY</button>
+      </div>
+      <div class="trybar">
+        <a class="trybtn" href="https://melatoninj.github.io/protein2dna/" target="_blank" rel="noopener">Try it in the browser</a>
+        <span>The same tool, with Python itself running inside the page — nothing you paste is sent anywhere,
+          because there is no server to send it to.</span>
+      </div>
+      <div class="swmore">
+      <p class="swdef" style="font-size:calc(14.5px * var(--fs));margin-top:12px;color:var(--muted)"><code>p2d ui</code> opens a local
+        website in the browser, <code>p2d design</code> and <code>p2d batch</code> run from the terminal, and
+        <code>import p2d</code> scripts it. The site is an easier way to use p2d for anyone who isn't used to python.</p>
+      <div class="feat">
+        <div>Reads your plasmid from GenBank, SnapGene or FASTA — and finds the start codon from the sequence itself when the file carries no annotation</div>
+        <div>Suggests every usable pair of restriction sites, grouped by the protein each pair would produce</div>
+        <div>N- and C-terminal tags and linkers, or a read-through into the vector's own tag with the frame bases added</div>
+        <div>Codons provably free of both enzymes' sites — on either strand, and across the junctions with the vector</div>
+        <div>Round-trip check: the order is cut and ligated in silico and must rebuild the planned plasmid exactly</div>
+        <div>Batch design from a FASTA; exports CSV, FASTA and an annotated GenBank per construct</div>
+      </div>
+      <p class="swdef" style="font-size:calc(15px * var(--fs));margin-top:18px">Currently developing the quality by gathering more data.</p>
+      </div>
+      <div class="gwrap" style="margin-top:24px">
+        <div class="gal">
+          <img class="on" src="img/p2d-1-app.webp" data-cap="Paste a protein, pick a plasmid and two restriction sites, and the whole construct is worked out — in the browser, on your own machine." alt="Paste a protein, pick a plasmid and two restriction sites, and the whole construct is worked out — in the browser, on your own machine.">
+          <img src="img/p2d-5-pairs.webp" data-cap="Every usable pair of sites, grouped by the protein each one produces and ordered by how little it adds — some keep the vector's own tag, some drop it." alt="Every usable pair of sites, grouped by the protein each one produces and ordered by how little it adds — some keep the vector's own tag, some drop it.">
+          <img src="img/p2d-4-fusion.webp" data-cap="What the insert is made of, the check digest, and the fusion protein the vector will express." alt="What the insert is made of, the check digest, and the fusion protein the vector will express.">
+          <img src="img/p2d-3-validation.webp" data-cap="The fusion protein residue by residue — the vector's own sequence, the two scar residues the restriction sites leave behind, then your protein." alt="The fusion protein residue by residue — the vector's own sequence, the two scar residues the restriction sites leave behind, then your protein.">
+          <img src="img/p2d-2-order.webp" data-cap="The DNA to order — an in-silico digest and ligation confirm it lands exactly as planned." alt="The DNA to order — an in-silico digest and ligation confirm it lands exactly as planned.">
+          <button class="gnav prev" aria-label="Previous image">‹</button>
+          <button class="gnav next" aria-label="Next image">›</button>
+        </div>
+        <div class="gbar"><span class="gcap"></span><span class="gcount"></span><span class="gdots"></span></div>
+      </div>
+      <div class="icons" style="margin-top:20px">
+        <a href="https://github.com/MelatoninJ/protein2dna" title="GitHub"><svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-.9-2.6c3-.3 6.2-1.5 6.2-6.7A5.2 5.2 0 0 0 19.9 5a4.9 4.9 0 0 0-.1-3.6s-1.1-.3-3.7 1.4a12.6 12.6 0 0 0-6.6 0C6.9 1.1 5.8 1.4 5.8 1.4A4.9 4.9 0 0 0 5.7 5a5.2 5.2 0 0 0-1.4 3.6c0 5.2 3.2 6.4 6.2 6.7a3.4 3.4 0 0 0-.9 2.6V22"/></svg></a>
+      </div>
+    </article>
+  </section>
+
+  <!-- ============ SPECTRUM ============ -->
+  <section class="panel rv" id="spectrum">
+    <div class="shead"><h2>Skills</h2></div>
+
+    <div class="spec2">
+      <div class="col2 w">
+        <h4>Bench</h4>
+        <ul>
+          <li>Cloning, restriction digest, ligation</li>
+          <li>Bacterial transformation &amp; colony screening</li>
+          <li>Agarose gel electrophoresis, gel extraction</li>
+          <li>Protein expression in <i>E. coli</i>, IPTG induction</li>
+          <li>Ni-NTA purification, dialysis, Bradford assay</li>
+          <li>SDS-PAGE &amp; Western blot</li>
+          <li>Chemical decapsulation of an IC package</li>
+          <li>CAD modelling, 3D printing</li>
+          <li>Arduino and Raspberry Pi builds (board and camera)</li>
+        </ul>
+      </div>
+      <div class="col2 d">
+        <h4>Terminal</h4>
+        <ul>
+          <li>RFdiffusion · ProteinMPNN · RFantibody</li>
+          <li>AlphaFold2-Multimer · Boltz-2 · RoseTTAFold2</li>
+          <li>PyRx · AutoDock Vina · PyMOL · RDKit</li>
+          <li>Python · R · Bash</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RECORD ============ -->
+  <section class="panel rv" id="record">
+    <div class="shead"><h2>Record</h2></div>
+    <div class="tl">
+      <div class="it">
+        <div class="d">2026 —</div>
+        <div><div class="h">Co-founder &amp; CTO, <a class="ln" href="https://asperitas.bio/">Asperitas Inc.</a></div>
+          <div class="s">Turning biodiversity into biotechnology — sourcing underexplored species and turning their molecules into validated protein–small-molecule data</div></div>
+      </div>
+      <div class="it">
+        <div class="d">2026</div>
+        <div><div class="h">Gold Medal, 37th International Biology Olympiad</div>
+          <div class="s">Vilnius, Lithuania</div></div>
+      </div>
+      <div class="it">
+        <div class="d">2025 — 2026</div>
+        <div><div class="h">Student Council President</div>
+          <div class="s">Seoul Science High School</div></div>
+      </div>
+      <div class="it">
+        <div class="d">2024 — 2026</div>
+        <div><div class="h">First Place × 4, Independent Research Competition</div>
+          <div class="s">Seoul Science High School — placed first in every edition held</div></div>
+      </div>
+      <div class="it">
+        <div class="d">2025 · 2026</div>
+        <div><div class="h">President's Award × 2, Gifted High School Joint Research Symposium</div>
+          <div class="s">POSTECH (2025) · UNIST (2026)</div></div>
+      </div>
+      <div class="it">
+        <div class="d">2025</div>
+        <div><div class="h">First Prize, Youth Science Club Research Competition</div>
+          <div class="s">Ministry of Science and ICT, Republic of Korea</div></div>
+      </div>
+      <div class="it">
+        <div class="d">2025</div>
+        <div><div class="h">GTC-ISPC 2025</div>
+          <div class="s">Physics &amp; Engineering — second runner-up</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section class="panel cta rv" id="contact">
+    <div class="big">Open to conversations about<br>discovery, design, validation, and what comes after.</div>
+    <a class="em" href="mailto:supermin08@gmail.com">supermin08@gmail.com</a>
+    <div class="inline">
+      <a class="chip" href="https://github.com/MelatoninJ">GitHub</a>
+      <a class="chip" href="https://scholar.google.com/">Scholar</a>
+    </div>
+  </section>
+
+  <footer>© 2026 Minjae Kim</footer>
+</div>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Enlarged image" hidden>
+  <button class="lb-close" id="lb-close" aria-label="Close">×</button>
+  <button class="lb-nav prev" id="lb-prev" aria-label="Previous image">‹</button>
+  <img id="lb-img" alt="">
+  <button class="lb-nav next" id="lb-next" aria-label="Next image">›</button>
+  <div class="lb-bar"><span class="lb-cap" id="lb-cap"></span><span class="lb-count" id="lb-count"></span></div>
+</div>
+
+<script>
+document.documentElement.setAttribute('data-theme','light');
+/* ---------- 글자 크기: 100% / 112% / 126% 순환 ---------- */
+(function(){
+  var e=document.documentElement, b=document.getElementById('fs'), lv=1;
+  try{ lv = parseInt(localStorage.getItem('fs'),10) || 1; }catch(err){}
+  if(lv<1 || lv>3) lv=1;
+  function apply(){
+    if(lv===1) e.removeAttribute('data-fs'); else e.setAttribute('data-fs', lv);
+    b.classList.toggle('on', lv>1);
+    b.setAttribute('aria-label','Text size: '+['100%','112%','126%'][lv-1]);
+    try{ localStorage.setItem('fs', lv); }catch(err){}
+  }
+  b.addEventListener('click', function(){ lv = lv % 3 + 1; apply(); });
+  apply();
+})();
+
+document.getElementById('theme').onclick = function(){
+  var e = document.documentElement;
+  e.setAttribute('data-theme', e.getAttribute('data-theme')==='dark'?'light':'dark');
+};
+
+/* ---------- 카드 본문 접기: 처음에는 일부만, See more 로 펼치기 ---------- */
+function setupClamp(){
+  [['.proj .brief',170], ['.sw .swmore',160]].forEach(function(spec){
+    document.querySelectorAll(spec[0]).forEach(function(dl){
+      if(dl.dataset.clampReady) return;
+      dl.dataset.clampReady='1';
+      if(dl.scrollHeight <= spec[1]) return;      // 짧으면 그대로 둔다
+      var btn=document.createElement('button');
+      btn.type='button'; btn.className='morebtn';
+      btn.textContent='See more'; btn.setAttribute('aria-expanded','false');
+      dl.classList.add('clip');
+      dl.parentNode.insertBefore(btn, dl.nextSibling);
+      btn.addEventListener('click',function(){
+        var open = !dl.classList.toggle('clip');
+        btn.textContent = open ? 'See less' : 'See more';
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if(!open) dl.scrollIntoView({block:'nearest'});
+      });
+    });
+  });
+}
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(setupClamp);
+else addEventListener('load',setupClamp);
+setTimeout(setupClamp,1200);                     // 폰트가 끝내 안 와도 동작하도록
+
+/* ---------- 라이트박스: 사진을 눌러 크게 보기 ---------- */
+var LB={el:document.getElementById('lb'), img:document.getElementById('lb-img'),
+        cap:document.getElementById('lb-cap'), cnt:document.getElementById('lb-count'),
+        imgs:[], i:0, back:null, sync:null};
+function lbShow(){
+  var im=LB.imgs[LB.i];
+  LB.img.src=im.src; LB.img.alt=im.alt||'';
+  LB.cap.textContent=im.dataset.cap||'';
+  LB.cnt.textContent=(LB.i+1)+' / '+LB.imgs.length;
+  var one=LB.imgs.length<2;
+  document.getElementById('lb-prev').style.display=one?'none':'grid';
+  document.getElementById('lb-next').style.display=one?'none':'grid';
+}
+function lbGo(n){ LB.i=(n+LB.imgs.length)%LB.imgs.length; lbShow(); }
+function lbOpen(list,index,syncFn){
+  LB.imgs=list; LB.i=index; LB.sync=syncFn||null;
+  LB.back=document.activeElement;
+  LB.el.hidden=false; document.body.style.overflow='hidden';
+  lbShow(); document.getElementById('lb-close').focus();
+}
+function lbClose(){
+  LB.el.hidden=true; document.body.style.overflow='';
+  if(LB.sync) LB.sync(LB.i);                 // 닫을 때 카드 갤러리도 같은 장으로
+  if(LB.back && LB.back.focus) LB.back.focus();
+}
+document.getElementById('lb-close').addEventListener('click',lbClose);
+document.getElementById('lb-prev').addEventListener('click',function(){ lbGo(LB.i-1); });
+document.getElementById('lb-next').addEventListener('click',function(){ lbGo(LB.i+1); });
+LB.el.addEventListener('click',function(e){ if(e.target===LB.el||e.target.classList.contains('lb-bar')) lbClose(); });
+document.addEventListener('keydown',function(e){
+  if(LB.el.hidden) return;
+  if(e.key==='Escape') lbClose();
+  else if(e.key==='ArrowLeft') lbGo(LB.i-1);
+  else if(e.key==='ArrowRight') lbGo(LB.i+1);
+});
+var lsx=null;
+LB.el.addEventListener('touchstart',function(e){ lsx=e.touches[0].clientX; },{passive:true});
+LB.el.addEventListener('touchend',function(e){
+  if(lsx===null) return;
+  var dx=e.changedTouches[0].clientX-lsx;
+  if(Math.abs(dx)>50) lbGo(dx<0?LB.i+1:LB.i-1);
+  lsx=null;
+},{passive:true});
+
+/* ---------- 이미지 갤러리 ---------- */
+document.querySelectorAll('.gwrap').forEach(function(w){
+  var imgs=[].slice.call(w.querySelectorAll('.gal img'));
+  if(!imgs.length) return;
+  var cap=w.querySelector('.gcap'), cnt=w.querySelector('.gcount'), dots=w.querySelector('.gdots');
+  var i=0;
+  imgs.forEach(function(_,k){
+    var d=document.createElement('i');
+    d.addEventListener('click',function(){ go(k); });
+    dots.appendChild(d);
+  });
+  function go(n){
+    i=(n+imgs.length)%imgs.length;
+    imgs.forEach(function(im,k){ im.classList.toggle('on',k===i); });
+    [].forEach.call(dots.children,function(d,k){ d.classList.toggle('on',k===i); });
+    cap.textContent=imgs[i].dataset.cap||'';
+    cnt.textContent=(i+1)+' / '+imgs.length;
+  }
+  w.querySelector('.prev').addEventListener('click',function(){ go(i-1); });
+  w.querySelector('.next').addEventListener('click',function(){ go(i+1); });
+  w.querySelector('.gal').addEventListener('keydown',function(e){
+    if(e.key==='ArrowLeft'){ go(i-1); } if(e.key==='ArrowRight'){ go(i+1); }
+  });
+  // 모바일 스와이프
+  var sx=null;
+  w.querySelector('.gal').addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; },{passive:true});
+  w.querySelector('.gal').addEventListener('touchend',function(e){
+    if(sx===null) return;
+    var dx=e.changedTouches[0].clientX-sx;
+    if(Math.abs(dx)>45) go(dx<0 ? i+1 : i-1);
+    sx=null;
+  },{passive:true});
+  if(imgs.length<2){ w.querySelectorAll('.gnav').forEach(function(b){ b.style.display='none'; }); }
+  // 사진을 누르면 라이트박스로 확대
+  imgs.forEach(function(im,k){
+    im.addEventListener('click',function(){ lbOpen(imgs,k,go); });
+  });
+  go(0);
+});
+
+document.querySelectorAll('.install button').forEach(function(b){
+  b.addEventListener('click', function(){
+    navigator.clipboard.writeText(b.dataset.copy).then(function(){
+      var old=b.textContent; b.textContent='COPIED';
+      setTimeout(function(){ b.textContent=old; }, 1400);
+    }).catch(function(){ b.textContent='FAILED'; setTimeout(function(){b.textContent='COPY';},1400); });
+  });
+});
+
+var io = new IntersectionObserver(function(es){
+  es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('on'); io.unobserve(e.target); } });
+}, {threshold:.03, rootMargin:'0px 0px -60px 0px'});
+document.querySelectorAll('.rv').forEach(function(el){ io.observe(el); });
+
+/* 페이지 전체 색 필드 */
+(function(){
+  var cv = document.getElementById('field'), ctx = cv.getContext('2d');
+  var off = document.createElement('canvas'), oc = off.getContext('2d');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var HUES  = [168, 196, 232, 286, 336, 34];
+  var CYCLE = 0.0016;
+  var SAT_L = 44, LIT_L = 93;
+  var SAT_D = 34, LIT_D = 13;
+
+  var OW = 84, OH = 84;
+  off.width = OW; off.height = OH;
+  var blobs = HUES.map(function(h,i){
+    var a = i/HUES.length*6.2832;
+    return { h:h, ox:.5+Math.cos(a)*.34, oy:.5+Math.sin(a)*.34,
+      ax:.22+Math.random()*.13, ay:.20+Math.random()*.13,
+      sx:.00004+Math.random()*.00005, sy:.000035+Math.random()*.000045,
+      px:Math.random()*99, py:Math.random()*99, r:.50+Math.random()*.30 };
+  });
+  function fit(){
+    var dpr = Math.min(devicePixelRatio||1, 1.5);
+    cv.width = innerWidth*dpr; cv.height = innerHeight*dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  }
+  var last = 0, liveEl = document.querySelector('.dot');
+  function draw(t){
+    var dark = document.documentElement.getAttribute('data-theme')==='dark';
+    var S = dark?SAT_D:SAT_L, L = dark?LIT_D:LIT_L;
+    oc.fillStyle = 'hsl('+((HUES[0]+t*CYCLE)%360)+','+S+'%,'+(L+(dark?-3:4))+'%)';
+    oc.fillRect(0,0,OW,OH);
+    for(var i=0;i<blobs.length;i++){
+      var b = blobs[i];
+      var x = (b.ox + Math.sin(t*b.sx + b.px)*b.ax)*OW;
+      var y = (b.oy + Math.cos(t*b.sy + b.py)*b.ay)*OH;
+      var rad = OW*b.r, hue = (b.h + t*CYCLE)%360;
+      var g = oc.createRadialGradient(x,y,0,x,y,rad);
+      g.addColorStop(0,   'hsla('+hue+','+S+'%,'+L+'%,0.92)');
+      g.addColorStop(0.55,'hsla('+hue+','+S+'%,'+L+'%,0.36)');
+      g.addColorStop(1,   'hsla('+hue+','+S+'%,'+L+'%,0)');
+      oc.fillStyle = g; oc.fillRect(0,0,OW,OH);
+    }
+    ctx.drawImage(off, 0, 0, innerWidth, innerHeight);
+    if(liveEl){
+      var lh = (HUES[2] + t*CYCLE)%360;
+      liveEl.style.background = 'hsl('+lh+','+(dark?52:60)+'%,'+(dark?58:62)+'%)';
+    }
+  }
+  function loop(t){
+    requestAnimationFrame(loop);
+    if(document.hidden || t-last < 50) return;
+    last = t; draw(t);
+  }
+  var rt; addEventListener('resize', function(){
+    clearTimeout(rt); rt=setTimeout(function(){ fit(); draw(performance.now()); }, 160);
+  });
+  fit(); draw(0);
+  if(!reduce) requestAnimationFrame(loop);
+})();
+</script>
 </body>
 </html>
