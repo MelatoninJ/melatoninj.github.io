@@ -19,6 +19,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
+  --fs:1;
   --card:#ffffff; --card-soft:rgba(255,255,255,.72);
   --text:#16181d; --body:#3d434d; --muted:#6a707b; --faint:#7e8694; --line:#e7e9ee;
   --link:#1b6350; --accent:#1b6350; --wet:#2b7f60; --dry:#3d5da8;
@@ -35,12 +36,15 @@ html[data-theme="dark"]{
   --shadow-lift:0 2px 8px rgba(0,0,0,.45), 0 24px 64px rgba(0,0,0,.5);
   --pill:rgba(22,26,32,.7);
 }
+/* 글자 크기 3단계 — 네비의 A 버튼이 html[data-fs] 를 바꾼다 */
+html[data-fs="2"]{--fs:1.12}
+html[data-fs="3"]{--fs:1.26}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;scroll-padding-top:110px}
 body{
   color:var(--text);background:#f3f4f7;
   font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
-  font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased;
+  font-size:calc(16.5px * var(--fs));line-height:1.75;-webkit-font-smoothing:antialiased;
   text-rendering:optimizeLegibility;
 }
 html[data-theme="dark"] body{background:#0d0f12}
@@ -64,10 +68,12 @@ html[data-theme="dark"] nav .pill{border-color:rgba(255,255,255,.09)}
   box-shadow:0 0 0 3px color-mix(in srgb,var(--live) 26%,transparent);transition:background .4s}
 nav a.nl{padding:6px 13px;border-radius:999px;font-size:14px;color:var(--muted);transition:.18s;white-space:nowrap}
 nav a.nl:hover{color:var(--text);background:color-mix(in srgb,var(--text) 7%,transparent)}
-#theme{width:31px;height:31px;border:none;border-radius:50%;cursor:pointer;
+#theme,#fs{width:31px;height:31px;border:none;border-radius:50%;cursor:pointer;
   background:color-mix(in srgb,var(--text) 8%,transparent);color:var(--muted);
   display:grid;place-items:center;font-size:13px;margin-left:4px;flex-shrink:0}
-#theme:hover{color:var(--text)}
+#theme:hover,#fs:hover{color:var(--text)}
+#fs{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:15px;letter-spacing:-.02em}
+#fs.on{color:var(--accent);background:color-mix(in srgb,var(--accent) 15%,transparent)}
 @media(max-width:860px){ nav a.nl{display:none} }
 
 /* ============ shell ============ */
@@ -82,7 +88,7 @@ nav a.nl:hover{color:var(--text);background:color-mix(in srgb,var(--text) 7%,tra
 .hero h1{font-size:clamp(2.6rem,8.4vw,6.4rem);font-weight:500;letter-spacing:-.045em;
   line-height:1;white-space:nowrap}
 .hero .say{margin-top:28px;font-family:'Space Grotesk',sans-serif;
-  font-size:clamp(1.1rem,2.6vw,1.8rem);font-weight:300;line-height:1.35;
+  font-size:calc(clamp(1.1rem,2.6vw,1.8rem) * var(--fs));font-weight:300;line-height:1.35;
   letter-spacing:-.025em;color:var(--body)}
 .hero .say b{font-weight:500;color:var(--text)}
 .scrollcue{position:absolute;bottom:46px;left:0;font-family:'JetBrains Mono',monospace;
@@ -100,12 +106,12 @@ nav a.nl:hover{color:var(--text);background:color-mix(in srgb,var(--text) 7%,tra
 
 /* ============ section head ============ */
 .shead{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:12px}
-.shead h2{font-size:clamp(1.9rem,3.8vw,2.7rem);font-weight:500;letter-spacing:-.032em;line-height:1.1}
+.shead h2{font-size:calc(clamp(1.9rem,3.8vw,2.7rem) * var(--fs));font-weight:500;letter-spacing:-.032em;line-height:1.1}
 
 /* ============ about ============ */
 .about{display:grid;grid-template-columns:1fr 300px;gap:56px;margin-top:40px;align-items:start}
 @media(max-width:880px){.about{grid-template-columns:1fr;gap:34px}}
-.about p{margin-bottom:17px;font-weight:400;color:var(--body);font-size:16.5px;max-width:62ch}
+.about p{margin-bottom:17px;font-weight:400;color:var(--body);font-size:calc(16.5px * var(--fs));max-width:62ch}
 .about p:last-child{margin-bottom:0}
 .about .ln{color:var(--link);border-bottom:1px solid color-mix(in srgb,var(--link) 34%,transparent)}
 .pf{width:100%;aspect-ratio:4/5;border-radius:20px;object-fit:cover;
@@ -143,7 +149,7 @@ nav a.nl:hover{color:var(--text);background:color-mix(in srgb,var(--text) 7%,tra
 @media(hover:none){.gnav{opacity:.92}}
 .gal img.on{cursor:zoom-in}
 .gbar{display:flex;align-items:center;gap:12px;margin-top:11px;padding:0 2px}
-.gcap{flex:1;font-size:13px;color:var(--muted);font-weight:400;line-height:1.55}
+.gcap{flex:1;font-size:calc(13.5px * var(--fs));color:var(--muted);font-weight:400;line-height:1.55}
 .gcount{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--faint);flex-shrink:0}
 .gdots{display:flex;gap:5px;flex-shrink:0}
 .gdots i{width:6px;height:6px;border-radius:50%;background:var(--line);display:block;
@@ -170,7 +176,7 @@ nav a.nl:hover{color:var(--text);background:color-mix(in srgb,var(--text) 7%,tra
 .lb-bar{position:absolute;left:0;right:0;bottom:0;padding:20px max(16px,6vw) 26px;
   display:flex;align-items:baseline;gap:16px;justify-content:center;
   background:linear-gradient(to top,rgba(10,12,16,.75),transparent)}
-.lb-cap{color:rgba(255,255,255,.88);font-size:14px;font-weight:400;line-height:1.55;max-width:74ch}
+.lb-cap{color:rgba(255,255,255,.88);font-size:calc(14.5px * var(--fs));font-weight:400;line-height:1.55;max-width:74ch}
 .lb-count{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(255,255,255,.5);
   flex-shrink:0;letter-spacing:.06em}
 @media(max-width:700px){.lb img{max-height:68vh}
@@ -178,40 +184,40 @@ nav a.nl:hover{color:var(--text);background:color-mix(in srgb,var(--text) 7%,tra
 @media(prefers-reduced-motion:reduce){.lb{animation:none}}
 .pnum{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--faint);letter-spacing:.08em}
 .tags{display:flex;gap:7px;margin-top:15px;flex-wrap:wrap}
-.tag{font-size:12.5px;font-weight:400;letter-spacing:0;color:var(--muted);line-height:1.5;
+.tag{font-size:calc(13px * var(--fs));font-weight:400;letter-spacing:0;color:var(--muted);line-height:1.5;
   padding:4px 12px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}
 .tag.k{color:var(--text);border-color:color-mix(in srgb,var(--text) 20%,transparent)}
 .tag.y{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.05em;padding:4px 11px}
-.proj h3{font-size:clamp(1.2rem,2.2vw,1.5rem);font-weight:500;letter-spacing:-.026em;
+.proj h3{font-size:calc(clamp(1.34rem,2.5vw,1.74rem) * var(--fs));font-weight:500;letter-spacing:-.026em;
   line-height:1.24;margin-top:10px}
-.hook{margin-top:13px;font-family:'Space Grotesk',sans-serif;font-size:16.5px;font-weight:500;
+.hook{margin-top:13px;font-family:'Space Grotesk',sans-serif;font-size:calc(17.5px * var(--fs));font-weight:500;
   letter-spacing:-.018em;line-height:1.42;color:var(--accent)}
-.proj p.d{margin-top:16px;font-size:15.5px;font-weight:400;color:var(--body)}
+.proj p.d{margin-top:16px;font-size:calc(16px * var(--fs));font-weight:400;color:var(--body)}
 .proj p.d + p.d{margin-top:11px}
 .proj p.d b{font-weight:500;color:var(--text)}
 /* Built / For / Now 요약 블록 */
 .brief{display:grid;grid-template-columns:54px 1fr;gap:2px 18px;margin-top:22px}
 .brief dt{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.13em;
   text-transform:uppercase;color:var(--muted);padding-top:7px}
-.brief dd{margin:0 0 13px;font-size:15.5px;font-weight:400;color:var(--body);line-height:1.74}
+.brief dd{margin:0 0 13px;font-size:calc(16px * var(--fs));font-weight:400;color:var(--body);line-height:1.74}
 .brief dd:last-of-type{margin-bottom:0}
 .brief dd b{font-weight:500;color:var(--text)}
-.brief.clip{max-height:150px;overflow:hidden;position:relative}
+.brief.clip{max-height:calc(150px * var(--fs));overflow:hidden;position:relative}
 .brief.clip::after{content:'';position:absolute;left:0;right:0;bottom:0;height:70px;
   background:linear-gradient(to bottom,transparent,var(--card));pointer-events:none}
 .morebtn{align-self:flex-start;margin-top:14px;background:none;border:none;padding:3px 0;
-  font-family:inherit;font-size:14px;color:var(--accent);cursor:pointer;
+  font-family:inherit;font-size:calc(14.5px * var(--fs));color:var(--accent);cursor:pointer;
   border-bottom:1px solid color-mix(in srgb,var(--accent) 34%,transparent)}
 .morebtn:hover{border-bottom-color:var(--accent)}
 .swmore{margin-top:0}
-.swmore.clip{max-height:150px;overflow:hidden;position:relative}
+.swmore.clip{max-height:calc(150px * var(--fs));overflow:hidden;position:relative}
 .swmore.clip::after{content:'';position:absolute;left:0;right:0;bottom:0;height:72px;
   background:linear-gradient(to bottom,transparent,var(--card));pointer-events:none}
 .sw .morebtn{display:block;margin-top:16px}
 @media(max-width:520px){.brief{grid-template-columns:1fr;gap:1px}
   .brief dt{padding-top:8px} .brief dd{margin-bottom:6px}}
 .role{margin-top:20px;padding-top:16px;border-top:1px solid var(--line);
-  font-size:14px;color:var(--muted);font-weight:400}
+  font-size:calc(14.5px * var(--fs));color:var(--muted);font-weight:400}
 .role b{font-weight:600;color:var(--text)}
 .proj > div:last-child{display:flex;flex-direction:column;flex:1}
 .icons{display:flex;gap:8px;margin-top:auto;padding-top:20px}
@@ -233,7 +239,7 @@ nav a.nl:hover{color:var(--text);background:color-mix(in srgb,var(--text) 7%,tra
 .badges{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .badge-t{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.04em;
   padding:3px 8px;border-radius:5px;border:1px solid var(--line);color:var(--muted)}
-.swdef{margin-top:16px;font-size:16.5px;font-weight:400;color:var(--body);max-width:70ch;line-height:1.72}
+.swdef{margin-top:16px;font-size:calc(16.5px * var(--fs));font-weight:400;color:var(--body);max-width:70ch;line-height:1.72}
 .swdef b{font-weight:500}
 .install{display:flex;align-items:center;gap:12px;margin-top:20px;
   background:color-mix(in srgb,var(--text) 5%,transparent);
@@ -249,7 +255,7 @@ nav a.nl:hover{color:var(--text);background:color-mix(in srgb,var(--text) 7%,tra
 .feat{margin-top:24px;padding-top:20px;border-top:1px solid var(--line);
   display:grid;grid-template-columns:repeat(2,1fr);gap:10px 28px}
 @media(max-width:700px){.feat{grid-template-columns:1fr}}
-.feat div{font-size:15px;font-weight:400;color:var(--body);line-height:1.68}
+.feat div{font-size:calc(15.5px * var(--fs));font-weight:400;color:var(--body);line-height:1.68}
 .feat div::before{content:'—';color:var(--faint);margin-right:9px}
 .swfig{margin-top:24px;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#fff}
 .swfig img{width:100%;display:block}
@@ -263,7 +269,7 @@ html[data-theme="dark"] .swfig{background:#f7f8fa}
   text-transform:uppercase;font-weight:500;margin-bottom:16px}
 .col2.w h4{color:var(--wet)} .col2.d h4{color:var(--dry)}
 .col2 ul{list-style:none}
-.col2 li{padding:10px 0;border-top:1px solid var(--line);font-size:15px;font-weight:400;color:var(--body)}
+.col2 li{padding:10px 0;border-top:1px solid var(--line);font-size:calc(15.5px * var(--fs));font-weight:400;color:var(--body)}
 .col2 li:first-child{border-top:none}
 .col2.w{border-color:color-mix(in srgb,var(--wet) 26%,transparent)}
 .col2.d{border-color:color-mix(in srgb,var(--dry) 26%,transparent)}
@@ -274,16 +280,16 @@ html[data-theme="dark"] .swfig{background:#f7f8fa}
 .it:first-child{border-top:none}
 @media(max-width:640px){.it{grid-template-columns:1fr;gap:4px}}
 .it .d{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--faint);padding-top:4px}
-.it .h{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:500;letter-spacing:-.02em}
-.it .s{color:var(--body);font-size:15px;font-weight:400}
+.it .h{font-family:'Space Grotesk',sans-serif;font-size:calc(18px * var(--fs));font-weight:500;letter-spacing:-.02em}
+.it .s{color:var(--body);font-size:calc(15.5px * var(--fs));font-weight:400}
 .it .h .ln{color:inherit;border-bottom:1px solid color-mix(in srgb,var(--link) 45%,transparent)}
 .it .h .ln:hover{color:var(--link);border-bottom-color:var(--link)}
 
 /* ============ contact ============ */
 .cta{text-align:center;padding:clamp(44px,6vw,80px) clamp(24px,5vw,64px)}
-.cta .big{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.7rem,4vw,2.7rem);
+.cta .big{font-family:'Space Grotesk',sans-serif;font-size:calc(clamp(1.7rem,4vw,2.7rem) * var(--fs));
   font-weight:400;letter-spacing:-.035em;line-height:1.18}
-.cta .em{display:inline-block;margin-top:22px;font-size:18px;color:var(--link);
+.cta .em{display:inline-block;margin-top:22px;font-size:calc(18px * var(--fs));color:var(--link);
   border-bottom:1px solid color-mix(in srgb,var(--link) 40%,transparent)}
 .cta .inline{justify-content:center;margin-top:30px}
 footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)}
@@ -306,6 +312,7 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
     <a class="nl" href="#software">Software</a>
     <a class="nl" href="#spectrum">Skills</a>
     <a class="nl" href="#record">Record</a>
+    <button id="fs" aria-label="Text size: 100%" title="Text size">A</button>
     <button id="theme" aria-label="Toggle theme">◐</button>
   </div>
 </nav>
@@ -374,7 +381,7 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
           <div class="pnum">01</div>
           <h3>Design and Expression of an RFdiffusion-based Anti-EpCAM VHH</h3>
           <p class="hook">A molecular glue that holds a cell without disturbing its state.</p>
-          <div class="tags"><span class="tag k">Graduate thesis</span><span class="tag y">2026-present</span><span class="tag">dry + wet lab</span></div>
+          <div class="tags"><span class="tag k">Graduate thesis</span><span class="tag y">2026</span><span class="tag">Computational + wet lab</span></div>
           <dl class="brief">
             <dt>Built</dt><dd>Designed with <b>RFdiffusion, ProteinMPNN and RoseTTAFold2</b>. In the course of designing VHHs a
               flaw in <b>AlphaFold2</b> surfaced, so the designs were re-evaluated with <b>Boltz-2</b>, which proved
@@ -458,7 +465,7 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
             <img src="img/morse-5-aim.webp" data-cap="Checking that the laser was reaching the school next door." alt="Checking that the laser was reaching the school next door.">
             <img src="img/morse-6-night.webp" data-cap="On the roof, once it was dark enough to see the beam." alt="On the roof, once it was dark enough to see the beam.">
             <img src="img/morse-7-roof.webp" data-cap="Watching the far side from our own roof." alt="Watching the far side from our own roof.">
-            <img src="img/morse-8-decoded.webp" data-cap="Decoding what came back: C · U · T · E · B · O · Y." alt="Decoding what came back: C · U · T · E · B · O · Y.">
+          <img src="img/morse-8-decoded.webp" data-cap="Decoding what came back: C · U · T · E · B · O · Y." alt="Decoding what came back: C · U · T · E · B · O · Y.">
             <button class="gnav prev" aria-label="Previous image">‹</button>
             <button class="gnav next" aria-label="Next image">›</button>
           </div>
@@ -471,8 +478,9 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
           <div class="tags"><span class="tag k">Invention club</span><span class="tag y">2024</span><span class="tag">Optical comms</span></div>
           <dl class="brief">
             <dt>Built</dt><dd>A line-of-sight optical link to the roof of the school next door: a laser on a tripod at one end,
-              a photoresistor and an Arduino inside a wooden box at the other, and code that turns the flicker
-              back into letters. <b>The link carried over 300 m.</b></dd>
+              a photoresistor and an Arduino inside a wooden box at the other. The receiver <b>measures its own
+              threshold against the ambient light</b> before each session, then recovers dot, dash and the breaks
+              between letters and words from nothing but how long the beam stays on and off. <b>The link carried over 300 m.</b></dd>
             <dt>For</dt><dd>Talking across a gap with no network and no radio — and for the romance of it.</dd>
             <dt>Now</dt><dd>Working. The first sentence through the beam asked for the Instagram ID of a cute boy.</dd>
           </dl>
@@ -553,7 +561,7 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
         <div class="swname"><a href="https://github.com/MelatoninJ/protein2dna">p2d</a></div>
         <div class="badges">
           <span class="badge-t">v0.2</span>
-          <span class="badge-t">PYTHON, CLI, LOCAL UI available</span>
+          <span class="badge-t">PYTHON · CLI · LOCAL UI</span>
           <span class="badge-t">MIT</span>
         </div>
       </div>
@@ -568,7 +576,7 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
         <button data-copy="git clone https://github.com/MelatoninJ/protein2dna && cd protein2dna && pip install -e .">COPY</button>
       </div>
       <div class="swmore">
-      <p class="swdef" style="font-size:14.5px;margin-top:12px;color:var(--muted)"><code>p2d ui</code> opens a local
+      <p class="swdef" style="font-size:calc(14.5px * var(--fs));margin-top:12px;color:var(--muted)"><code>p2d ui</code> opens a local
         website in the browser, <code>p2d design</code> and <code>p2d batch</code> run from the terminal, and
         <code>import p2d</code> scripts it. The site is an easier way to use p2d for anyone who isn't used to python.</p>
       <div class="feat">
@@ -579,7 +587,7 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
         <div>Round-trip check: the order is cut and ligated in silico and must rebuild the planned plasmid exactly</div>
         <div>Batch design from a FASTA; exports CSV, FASTA and an annotated GenBank per construct</div>
       </div>
-      <p class="swdef" style="font-size:15px;margin-top:18px">Currently developing the quality by gathering more data.</p>
+      <p class="swdef" style="font-size:calc(15px * var(--fs));margin-top:18px">Currently developing the quality by gathering more data.</p>
       </div>
       <div class="gwrap" style="margin-top:24px">
         <div class="gal">
@@ -621,10 +629,10 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
       <div class="col2 d">
         <h4>Terminal</h4>
         <ul>
-          <li>RFdiffusion | ProteinMPNN | RFantibody</li>
-          <li>AlphaFold2-Multimer | Boltz-2 | RoseTTAFold2</li>
-          <li>PyRx | PyMOL | RDKit</li>
-          <li>Python | R</li>
+          <li>RFdiffusion · ProteinMPNN · RFantibody</li>
+          <li>AlphaFold2-Multimer · Boltz-2 · RoseTTAFold2</li>
+          <li>PyRx · AutoDock Vina · PyMOL · RDKit</li>
+          <li>Python · R · Bash</li>
         </ul>
       </div>
     </div>
@@ -655,8 +663,8 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
           <div class="s">Seoul Science High School — placed first in every edition held</div></div>
       </div>
       <div class="it">
-        <div class="d">2025, 2026</div>
-        <div><div class="h">President's Award × 2, Joint Research Symposium of Gifted Highschools</div>
+        <div class="d">2025 · 2026</div>
+        <div><div class="h">President's Award × 2, Gifted High School Joint Research Symposium</div>
           <div class="s">POSTECH (2025) · UNIST (2026)</div></div>
       </div>
       <div class="it">
@@ -695,6 +703,21 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
 
 <script>
 document.documentElement.setAttribute('data-theme','light');
+/* ---------- 글자 크기: 100% / 112% / 126% 순환 ---------- */
+(function(){
+  var e=document.documentElement, b=document.getElementById('fs'), lv=1;
+  try{ lv = parseInt(localStorage.getItem('fs'),10) || 1; }catch(err){}
+  if(lv<1 || lv>3) lv=1;
+  function apply(){
+    if(lv===1) e.removeAttribute('data-fs'); else e.setAttribute('data-fs', lv);
+    b.classList.toggle('on', lv>1);
+    b.setAttribute('aria-label','Text size: '+['100%','112%','126%'][lv-1]);
+    try{ localStorage.setItem('fs', lv); }catch(err){}
+  }
+  b.addEventListener('click', function(){ lv = lv % 3 + 1; apply(); });
+  apply();
+})();
+
 document.getElementById('theme').onclick = function(){
   var e = document.documentElement;
   e.setAttribute('data-theme', e.getAttribute('data-theme')==='dark'?'light':'dark');
