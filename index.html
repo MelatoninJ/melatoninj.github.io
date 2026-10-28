@@ -203,6 +203,11 @@ nav a.nl:hover{color:var(--text);background:color-mix(in srgb,var(--text) 7%,tra
   font-family:inherit;font-size:14px;color:var(--accent);cursor:pointer;
   border-bottom:1px solid color-mix(in srgb,var(--accent) 34%,transparent)}
 .morebtn:hover{border-bottom-color:var(--accent)}
+.swmore{margin-top:0}
+.swmore.clip{max-height:150px;overflow:hidden;position:relative}
+.swmore.clip::after{content:'';position:absolute;left:0;right:0;bottom:0;height:72px;
+  background:linear-gradient(to bottom,transparent,var(--card));pointer-events:none}
+.sw .morebtn{display:block;margin-top:16px}
 @media(max-width:520px){.brief{grid-template-columns:1fr;gap:1px}
   .brief dt{padding-top:8px} .brief dd{margin-bottom:6px}}
 .role{margin-top:20px;padding-top:16px;border-top:1px solid var(--line);
@@ -562,6 +567,7 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
         <code>git clone https://github.com/MelatoninJ/protein2dna &amp;&amp; cd protein2dna &amp;&amp; pip install -e .</code>
         <button data-copy="git clone https://github.com/MelatoninJ/protein2dna && cd protein2dna && pip install -e .">COPY</button>
       </div>
+      <div class="swmore">
       <p class="swdef" style="font-size:14.5px;margin-top:12px;color:var(--muted)"><code>p2d ui</code> opens a local
         website in the browser, <code>p2d design</code> and <code>p2d batch</code> run from the terminal, and
         <code>import p2d</code> scripts it. The site is an easier way to use p2d for anyone who isn't used to python.</p>
@@ -574,6 +580,7 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
         <div>Batch design from a FASTA; exports CSV, FASTA and an annotated GenBank per construct</div>
       </div>
       <p class="swdef" style="font-size:15px;margin-top:18px">Currently developing the quality by gathering more data.</p>
+      </div>
       <div class="gwrap" style="margin-top:24px">
         <div class="gal">
           <img class="on" src="img/p2d-1-app.webp" data-cap="Paste a protein, pick a plasmid and two restriction sites, and the whole construct is worked out — in the browser, on your own machine." alt="Paste a protein, pick a plasmid and two restriction sites, and the whole construct is worked out — in the browser, on your own machine.">
@@ -695,20 +702,22 @@ document.getElementById('theme').onclick = function(){
 
 /* ---------- 카드 본문 접기: 처음에는 일부만, See more 로 펼치기 ---------- */
 function setupClamp(){
-  document.querySelectorAll('.proj .brief').forEach(function(dl){
-    if(dl.dataset.clampReady) return;
-    dl.dataset.clampReady='1';
-    if(dl.scrollHeight <= 170) return;          // 짧은 카드는 그대로 둔다
-    var btn=document.createElement('button');
-    btn.type='button'; btn.className='morebtn';
-    btn.textContent='See more'; btn.setAttribute('aria-expanded','false');
-    dl.classList.add('clip');
-    dl.parentNode.insertBefore(btn, dl.nextSibling);
-    btn.addEventListener('click',function(){
-      var open = !dl.classList.toggle('clip');
-      btn.textContent = open ? 'See less' : 'See more';
-      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      if(!open) dl.scrollIntoView({block:'nearest'});
+  [['.proj .brief',170], ['.sw .swmore',160]].forEach(function(spec){
+    document.querySelectorAll(spec[0]).forEach(function(dl){
+      if(dl.dataset.clampReady) return;
+      dl.dataset.clampReady='1';
+      if(dl.scrollHeight <= spec[1]) return;      // 짧으면 그대로 둔다
+      var btn=document.createElement('button');
+      btn.type='button'; btn.className='morebtn';
+      btn.textContent='See more'; btn.setAttribute('aria-expanded','false');
+      dl.classList.add('clip');
+      dl.parentNode.insertBefore(btn, dl.nextSibling);
+      btn.addEventListener('click',function(){
+        var open = !dl.classList.toggle('clip');
+        btn.textContent = open ? 'See less' : 'See more';
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if(!open) dl.scrollIntoView({block:'nearest'});
+      });
     });
   });
 }
