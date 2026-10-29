@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Minjae Kim</title>
-<!-- 검색엔진 색인 제외. 공개로 찾히게 하려면 이 줄과 robots.txt 를 지우세요. -->
+
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Minjae Kim — computational protein design and its experimental validation.">
 
@@ -36,7 +36,7 @@ html[data-theme="dark"]{
   --shadow-lift:0 2px 8px rgba(0,0,0,.45), 0 24px 64px rgba(0,0,0,.5);
   --pill:rgba(22,26,32,.7);
 }
-/* 글자 크기 3단계 — 네비의 A 버튼이 html[data-fs] 를 바꾼다 */
+
 html[data-fs="2"]{--fs:1.12}
 html[data-fs="3"]{--fs:1.26}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -157,7 +157,7 @@ nav a.nl:hover{color:var(--text);background:color-mix(in srgb,var(--text) 7%,tra
 .gdots i.on{background:var(--accent);transform:scale(1.3)}
 
 /* ============ lightbox ============ */
-/* display 를 지정하는 클래스는 hidden 속성을 이기므로 먼저 막아둔다 */
+
 [hidden]{display:none !important}
 .lb{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
   background:rgba(10,12,16,.93);backdrop-filter:blur(8px);animation:lbin .22s ease}
@@ -625,21 +625,19 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
           <li>Cloning, restriction digest, ligation</li>
           <li>Bacterial transformation &amp; colony screening</li>
           <li>Agarose gel electrophoresis, gel extraction</li>
-          <li>Protein expression in <i>E. coli</i>, IPTG induction</li>
-          <li>Ni-NTA purification, dialysis, Bradford assay</li>
+          <li>IPTG induction, Ni-NTA purification, Dialysis, Bradford assay</li>
           <li>SDS-PAGE &amp; Western blot</li>
-          <li>Chemical decapsulation of an IC package</li>
-          <li>CAD modelling, 3D printing</li>
-          <li>Arduino and Raspberry Pi builds (board and camera)</li>
+          <li>CAD modelling, 3D printing, Acrylic/Wood laser cutting</li>
+          <li>Arduino and Raspberry Pi builds (esp. RPI Camera module)</li>
         </ul>
       </div>
       <div class="col2 d">
         <h4>Terminal</h4>
         <ul>
-          <li>RFdiffusion · ProteinMPNN · RFantibody</li>
-          <li>AlphaFold2-Multimer · Boltz-2 · RoseTTAFold2</li>
-          <li>PyRx · AutoDock Vina · PyMOL · RDKit</li>
-          <li>Python · R · Bash</li>
+          <li>RFdiffusion, ProteinMPNN, RFantibody</li>
+          <li>AlphaFold2-Multimer, Boltz-2, RoseTTAFold2</li>
+          <li>PyRx, PyMOL, RDKit</li>
+          <li>Python, R</li>
         </ul>
       </div>
     </div>
