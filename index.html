@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Minjae Kim</title>
-
+<!-- 검색엔진 색인 제외. 공개로 찾히게 하려면 이 줄과 robots.txt 를 지우세요. -->
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Minjae Kim — Aspiring Engineer applying nature's products.">
+<meta name="description" content="Minjae Kim — computational protein design and its experimental validation.">
 
 <meta property="og:type" content="website">
-<meta property="og:title" content="Minjae Kim">
-<meta property="og:description" content="Aspiring Engineer applying nature's products.">
+<meta property="og:title" content="Minjae Kim — Biology / Bioengineering">
+<meta property="og:description" content="Computational protein design and its experimental validation.">
 <meta property="og:url" content="https://melatoninj.github.io/">
 <meta property="og:image" content="https://melatoninj.github.io/img/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -36,7 +36,7 @@ html[data-theme="dark"]{
   --shadow-lift:0 2px 8px rgba(0,0,0,.45), 0 24px 64px rgba(0,0,0,.5);
   --pill:rgba(22,26,32,.7);
 }
-
+/* 글자 크기 3단계 — 네비의 A 버튼이 html[data-fs] 를 바꾼다 */
 html[data-fs="2"]{--fs:1.12}
 html[data-fs="3"]{--fs:1.26}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -157,7 +157,7 @@ nav a.nl:hover{color:var(--text);background:color-mix(in srgb,var(--text) 7%,tra
 .gdots i.on{background:var(--accent);transform:scale(1.3)}
 
 /* ============ lightbox ============ */
-
+/* display 를 지정하는 클래스는 hidden 속성을 이기므로 먼저 막아둔다 */
 [hidden]{display:none !important}
 .lb{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
   background:rgba(10,12,16,.93);backdrop-filter:blur(8px);animation:lbin .22s ease}
@@ -464,9 +464,8 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
         <div class="gwrap">
           <div class="gal">
             <img class="on" src="img/morse-1-breadboard.webp" data-cap="Checking with a laser diode and a photoresistor that the beam could be read at all." alt="Checking with a laser diode and a photoresistor that the beam could be read at all.">
-            <img src="img/morse-2-receiver.webp" data-cap="Transceivers. An Arduino and a photoresistor behind a pinhole in the hinged lid." alt="Transceivers. An Arduino and a photoresistor behind a pinhole in the hinged lid.">
-            <img src="img/morse-9-pair.webp" data-cap="Samoong(Sagomungchi), the invention club, and the counterpart school SGHS." alt="Samoong(Sagomungchi), the invention club, and the counterpart school SGHS.">
-          <img src="img/morse-3-cad.webp" data-cap="The transmitter frame, modelled to bolt the laser to a tripod head." alt="The transmitter frame, modelled to bolt the laser to a tripod head.">
+            <img src="img/morse-2-receiver.webp" data-cap="One box for each roof — an Arduino and a photoresistor behind a pinhole in the hinged lid." alt="One box for each roof — an Arduino and a photoresistor behind a pinhole in the hinged lid.">
+            <img src="img/morse-9-pair.webp" data-cap="Engraved for the two ends of the link — Samoong, the invention club, and the school on the far roof." alt="Engraved for the two ends of the link — Samoong, the invention club, and the school on the far roof.">
             <img src="img/morse-4-rig.webp" data-cap="Alignment — a few millimetres of drift and the beam misses the far roof entirely." alt="Alignment — a few millimetres of drift and the beam misses the far roof entirely.">
             <img src="img/morse-5-aim.webp" data-cap="Checking that the laser was reaching the school next door." alt="Checking that the laser was reaching the school next door.">
             <img src="img/morse-6-night.webp" data-cap="On the roof, once it was dark enough to see the beam." alt="On the roof, once it was dark enough to see the beam.">
@@ -496,10 +495,11 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
       <article class="proj">
         <div class="gwrap">
           <div class="gal">
-            <img class="on" src="img/gelcut-1-v1.webp" data-cap="Version 1 — the cut is marked, but the frame blocks the blade from reaching it." alt="Version 1 — the cut is marked, but the frame blocks the blade from reaching it.">
+            <img class="on" src="img/gelcut-1-cad.webp" data-cap="Version 2 in CAD — the frame, the two sliding bars that set the line, and the upright the blade is drawn against." alt="Version 2 in CAD — the frame, the two sliding bars that set the line, and the upright the blade is drawn against.">
             <img src="img/gelcut-2-udon.webp" data-cap="Where the fix came from: a hand-made udon board." alt="Where the fix came from: a hand-made udon board.">
-            <img src="img/gelcut-4-v2.webp" data-cap="Version 2 — a hinge and a blade reference added." alt="Version 2 — a hinge and a blade reference added.">
-            <img src="img/gelcut-5-v2b.webp" data-cap="A version that does not depend on the gel's size." alt="A version that does not depend on the gel's size.">
+            <img src="img/gelcut-3-goggles.webp" data-cap="The same gel on the transilluminator, raw and through the amber goggles. The goggles are not optional — and behind them the gel loses its depth and its edges." alt="The same gel on the transilluminator, raw and through the amber goggles. The goggles are not optional — and behind them the gel loses its depth and its edges.">
+            <img src="img/gelcut-4-fit.webp" data-cap="The frame sized to the lab's standard gel, with the bar set on the band to be cut out." alt="The frame sized to the lab's standard gel, with the bar set on the band to be cut out.">
+            <img src="img/gelcut-5-cut.webp" data-cap="After the cut — the square the jig left, and the plug taken out of it." alt="After the cut — the square the jig left, and the plug taken out of it.">
             <button class="gnav prev" aria-label="Previous image">‹</button>
             <button class="gnav next" aria-label="Next image">›</button>
           </div>
@@ -527,9 +527,10 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
           <div class="gal">
             <img class="on" src="img/maker-6-course.webp" data-cap="The finished course — barriers, a turntable and other obstacles along the route." alt="The finished course seen from above">
             <img src="img/maker-1-plan.webp" data-cap="Blueprint." alt="Blueprint.">
-            <img src="img/maker-2-cad.webp" data-cap="The CAD version." alt="The CAD version.">
+            <img src="img/maker-2-cad.webp" data-cap="The layout in CAD, drawn curve by curve." alt="The layout in CAD, drawn curve by curve.">
+            <img src="img/maker-4-model.webp" data-cap="The same track as a 3D model, broken into sections small enough to print." alt="The same track as a 3D model, broken into sections small enough to print.">
+            <img src="img/maker-7-gear.webp" data-cap="The gear that moves a blocking wall — a rack on the wall meshes with it, so the servo only turns and the wall slides straight across the lane." alt="The gear that moves a blocking wall — a rack on the wall meshes with it, so the servo only turns and the wall slides straight across the lane.">
             <img src="img/maker-3-build.webp" data-cap="Assembly — a 3D-printed track on a scaffold of cut profiles and panels." alt="Assembly — a 3D-printed track on a scaffold of cut profiles and panels.">
-            <img src="img/maker-4-model.webp" data-cap="The same track as a 3D model." alt="The track modelled in 3D">
             <img src="img/maker-5-turntable.webp" data-cap="The turntable set into the track." alt="Turntable built into the course">
             <button class="gnav prev" aria-label="Previous image">‹</button>
             <button class="gnav next" aria-label="Next image">›</button>
@@ -544,8 +545,9 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
           <dl class="brief">
             <dt>Built</dt><dd>A 1v1 game on an RC car course, borrowed from Fall Guys — one player drives, the other
               does everything to stall them. Hand-drawn layout, redrawn in CAD, cut, then wired: <b>the blockers are
-              servo-driven barriers</b> that swing into the lane on a button press, so the second player is pressing
-              buttons against a car instead of just watching.</dd>
+              servo-driven barriers that slide into the lane on a button press.</b> Each one carries a length of rack
+              meshed with a gear on the servo, so a rotation a servo can actually manage becomes straight travel —
+              and the second player is pressing buttons against a car instead of just watching.</dd>
             <dt>For</dt><dd>An interesting encounter with invention, for primary and middle school students.</dd>
             <dt>Now</dt><dd>Ran as a hands-on booth for <b>over 100 primary and middle school teams</b> at the 2024
               Science–Math Convergence Maker Festival, start to finish.</dd>
@@ -625,19 +627,21 @@ footer{padding:26px 0 54px;text-align:center;font-size:12.5px;color:var(--faint)
           <li>Cloning, restriction digest, ligation</li>
           <li>Bacterial transformation &amp; colony screening</li>
           <li>Agarose gel electrophoresis, gel extraction</li>
-          <li>IPTG induction, Ni-NTA purification, Dialysis, Bradford assay</li>
+          <li>Protein expression in <i>E. coli</i>, IPTG induction</li>
+          <li>Ni-NTA purification, dialysis, Bradford assay</li>
           <li>SDS-PAGE &amp; Western blot</li>
-          <li>CAD modelling, 3D printing, Acrylic/Wood laser cutting</li>
-          <li>Arduino and Raspberry Pi builds (esp. RPI Camera module)</li>
+          <li>Chemical decapsulation of an IC package</li>
+          <li>CAD modelling, 3D printing</li>
+          <li>Arduino and Raspberry Pi builds (board and camera)</li>
         </ul>
       </div>
       <div class="col2 d">
         <h4>Terminal</h4>
         <ul>
-          <li>RFdiffusion, ProteinMPNN, RFantibody</li>
-          <li>AlphaFold2-Multimer, Boltz-2, RoseTTAFold2</li>
-          <li>PyRx, PyMOL, RDKit</li>
-          <li>Python, R</li>
+          <li>RFdiffusion · ProteinMPNN · RFantibody</li>
+          <li>AlphaFold2-Multimer · Boltz-2 · RoseTTAFold2</li>
+          <li>PyRx · AutoDock Vina · PyMOL · RDKit</li>
+          <li>Python · R · Bash</li>
         </ul>
       </div>
     </div>
